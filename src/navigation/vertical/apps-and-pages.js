@@ -45,6 +45,13 @@ export default [
     ],
   },
   {
+    title: 'Approvals',
+    icon: { icon: 'tabler-book' },
+    children: [
+      { title: 'Requests', to: 'apps-approvals' },
+    ],
+  },
+  {
     title: 'Academy',
     icon: { icon: 'tabler-book' },
     children: [
