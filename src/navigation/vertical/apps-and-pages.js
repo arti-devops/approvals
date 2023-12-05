@@ -49,6 +49,7 @@ export default [
     icon: { icon: 'tabler-book' },
     children: [
       { title: 'Requests', to: 'apps-approvals' },
+      { title: 'Hystory', to: 'apps-approvals-approval-history' },
     ],
   },
   {
