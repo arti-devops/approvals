@@ -9,7 +9,7 @@ import ApprovalRequestList from '@/views/apps/approvals/ApprovalRequestList.vue'
         Demandes de validation
       </h4>
       <p class="mb-0">
-        Liste des docuements en attente de validation.
+        Liste des documents en attente de validation.
       </p>
     </VCol>
 

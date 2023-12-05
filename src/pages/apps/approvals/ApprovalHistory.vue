@@ -12,7 +12,7 @@ import ApprovalHistory from '@/views/apps/approvals/ApprovalHistory.vue'
         Liste des documents validés, revoqués ou demandes annulées.
       </p>
     </VCol>
-
+    
     <VCol cols="12">
       <!-- 👉 User List  -->
       <ApprovalHistory />
