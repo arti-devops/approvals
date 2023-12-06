@@ -60,11 +60,15 @@ const resolveApprovalRequestStatusVariant = item => {
 </script>
 
 <template>
-  <VCard>
+  <VCard
+    title="Historique des validations"
+    subtitle="Liste des documents validés, revoqués ou demandes annulées."
+  >
+    <VDivider />
     <VDataTableServer
       :headers="approvalHeaders"
       :items="rdata"
-      :items-per-page="5"
+      :items-length="rdata.length"
     >
       <!-- Status -->
       <template #item.status="{ item }">

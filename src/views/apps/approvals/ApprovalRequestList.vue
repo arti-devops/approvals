@@ -61,12 +61,16 @@ const resolveApprovalRequestProgress = item => {
 </script>
 
 <template>
-  <VCard>
+  <VCard
+    title="Demandes de validation"
+    subtitle="Liste des documents en attente de validation."
+  >
+    <VDivider />
     <VDataTableServer
       :headers="approvalHeaders"
       :items="rdata"
+      :items-length="rdata.length"
       item-selectable
-      hide-no-data="true"
     >
       <!-- Status -->
       <template #item.status="{ item }">

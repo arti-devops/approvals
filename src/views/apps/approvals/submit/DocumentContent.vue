@@ -63,6 +63,7 @@ watch(() => props.currentStep, updateCartData)
                     item-value="value"
                     placeholder="Type du document"
                     prepend-icon="tabler-file-filled"
+                    :rules="[requiredValidator]"
                   />
                 </VCardText>
                 <VCardText>

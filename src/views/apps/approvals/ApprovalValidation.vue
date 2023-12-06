@@ -1,5 +1,4 @@
 <script setup>
-
 //Form data
 
 // Hello
@@ -16,10 +15,6 @@
         <VAvatar icon="tabler-calendar" />
         <span>Soumis le : 2 janvier 2023</span>
       </div>
-      <div>
-        <VAvatar icon="tabler-paperclip" />
-        <span>Le Document : document.pdf</span>
-      </div>
     </VCol>
   </VRow>
   <VRow>
@@ -27,7 +22,26 @@
       cols="12"
       md="8"
     >
-      <VCard title="Espace de validation">
+      <VCard>
+        <VCardText class="d-flex align-center flex-wrap gap-4">
+          <!-- 👉 Actions  -->
+          <div class="me-3 d-flex gap-3">
+            <h3>Espace de validation</h3>
+          </div>
+
+          <VSpacer />
+
+          <div class="d-flex align-center flex-wrap gap-4">
+            <!-- 👉 Export invoice -->
+            <VBtn
+              prepend-icon="tabler-paperclip"
+              variant="tonal"
+              color="secondary"
+            >
+              Voir le document
+            </VBtn>
+          </div>
+        </VCardText>
         <VCardText class="justify-center">
           <VForm
             ref="refForm"
