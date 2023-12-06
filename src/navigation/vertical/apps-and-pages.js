@@ -51,7 +51,7 @@ export default [
       { title: 'Requests', to: 'apps-approvals' },
       { title: 'History', to: 'apps-approvals-approval-history' },
       { title: 'Submit', to: 'apps-approvals-submit-request' },
-      { title: 'View', to: 'apps-approvals-approval-page' },
+      { title: 'View', to: { name: 'apps-approvals-view-id', params: { id: 10 } } },
     ],
   },
   {

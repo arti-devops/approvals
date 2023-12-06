@@ -1,6 +1,8 @@
 <script setup>
 import ApprovalSteps from '@/views/apps/approvals/ApprovalSteps.vue'
 import ApprovalValidation from '@/views/apps/approvals/ApprovalValidation.vue'
+
+const route = useRoute('apps-approvals-view-id')
 </script>
 
 <template>

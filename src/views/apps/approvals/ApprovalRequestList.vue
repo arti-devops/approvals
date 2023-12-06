@@ -99,9 +99,9 @@ const resolveApprovalRequestProgress = item => {
       </template>
 
       <!-- Actions -->
-      <template #item.actions>
+      <template #item.actions="{ item }">
         <div class="d-flex gap-1">
-          <IconBtn>
+          <IconBtn :to="{ name: 'apps-approvals-view-id', params: { id: item._id }}">
             <VIcon icon="tabler-file" />
           </IconBtn>
         </div>

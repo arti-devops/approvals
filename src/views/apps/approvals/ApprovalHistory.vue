@@ -1,5 +1,5 @@
 <script setup>
-import { VDataTableServer } from 'vuetify/labs/VDataTable'
+import { VDataTableServer } from 'vuetify/labs/VDataTable';
 
 const approvalHeaders = [
   {
@@ -88,9 +88,9 @@ const resolveApprovalRequestStatusVariant = item => {
       </template>
 
       <!-- Actions -->
-      <template #item.actions>
+      <template #item.actions="{item}">
         <div class="d-flex gap-1">
-          <IconBtn>
+          <IconBtn :to="{ name: 'apps-approvals-view-id', params : {id : item._id}}">
             <VIcon icon="tabler-file-filled" />
           </IconBtn>
         </div>
