@@ -46,6 +46,7 @@ declare module 'vue-router/auto/routes' {
     'apps-academy-my-course': RouteRecordInfo<'apps-academy-my-course', '/apps/academy/my-course', Record<never, never>, Record<never, never>>,
     'apps-approvals': RouteRecordInfo<'apps-approvals', '/apps/approvals', Record<never, never>, Record<never, never>>,
     'apps-approvals-approval-history': RouteRecordInfo<'apps-approvals-approval-history', '/apps/approvals/ApprovalHistory', Record<never, never>, Record<never, never>>,
+    'apps-approvals-approval-page': RouteRecordInfo<'apps-approvals-approval-page', '/apps/approvals/ApprovalPage', Record<never, never>, Record<never, never>>,
     'apps-calendar': RouteRecordInfo<'apps-calendar', '/apps/calendar', Record<never, never>, Record<never, never>>,
     'apps-chat': RouteRecordInfo<'apps-chat', '/apps/chat', Record<never, never>, Record<never, never>>,
     'apps-ecommerce-customer-details-id': RouteRecordInfo<'apps-ecommerce-customer-details-id', '/apps/ecommerce/customer/details/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,

@@ -50,6 +50,7 @@ export default [
     children: [
       { title: 'Requests', to: 'apps-approvals' },
       { title: 'Hystory', to: 'apps-approvals-approval-history' },
+      { title: 'View', to: 'apps-approvals-approval-page' },
     ],
   },
   {
