@@ -19,7 +19,7 @@ const { data: approvalDetails } = await useApi(createUrl(`/approval/details/${ r
       <h2>Validation du Document</h2>
     </VCol>
     <VCol cols="12">
-      <ApprovalValidation />
+      <ApprovalValidation :approval-details="approvalDetails" />
     </VCol>
   </VRow>
 </template>

@@ -1,5 +1,32 @@
 <script setup>
-//Form data
+const props = defineProps({
+  approvalDetails: {
+    type: Object,
+    required: true,
+  },
+})
+
+const approvalDetails = props.approvalDetails.approvalDetails
+
+const resolveStatusIcon = status => {
+  if (status === "pending") return { icon: "tabler-circle-dot", color: "warning", text: "Pending" }
+  if (status === "approved") return { icon: "tabler-send", color: "success", text: "Approuvé" }
+  if (status === "disapproved") return { icon: "tabler-exclamation-circle", color: "error", text: "Revoqué" }
+  
+  return "tabler-user"
+}
+
+const approvalStatusinfo = {
+  icon: resolveStatusIcon(approvalDetails.status).icon,
+  color: resolveStatusIcon(approvalDetails.status).color,
+  value: resolveStatusIcon(approvalDetails.status).text,
+}
+
+const formControl = {
+  isFormValid: !(approvalDetails.status === "pending"),
+}
+
+console.log(formControl)
 
 // Hello
 </script>
@@ -7,13 +34,21 @@
 <template>
   <VRow>
     <VCol cols="12">
+      <div style="margin-inline-start: 5px;">
+        <VAvatar
+          :icon="approvalStatusinfo.icon"
+          :color="approvalStatusinfo.color"
+          size="small"
+        />
+        <span class="mx-1">Status: {{ approvalStatusinfo.value }}</span>
+      </div>
       <div>
         <VAvatar icon="tabler-home" />
-        <span>Titre: Demande de permission pour mariage</span>
+        <span>Titre: {{ approvalDetails.title }}</span>
       </div>
       <div>
         <VAvatar icon="tabler-calendar" />
-        <span>Soumis le : 2 janvier 2023</span>
+        <span>Soumis le : {{ approvalDetails.createdAt }}</span>
       </div>
     </VCol>
   </VRow>
@@ -55,6 +90,7 @@
                 <VFileInput
                   label="Document signé"
                   :rules="[requiredValidator]"
+                  :disabled="formControl.isFormValid"
                 />
               </VCol>
 
@@ -62,6 +98,7 @@
                 <VCardText class="d-flex flex-column justify-center align-center">
                   <VBtn
                     type="submit"
+                    :disabled="formControl.isFormValid"
                     @click="refForm?.validate()"
                   >
                     Valider
@@ -100,6 +137,7 @@
           <VBtn
             variant="elevated"
             color="error"
+            :disabled="formControl.isFormValid"
           >
             Désapprouver
           </VBtn>
