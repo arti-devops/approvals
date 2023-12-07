@@ -49,8 +49,8 @@ export default [
     icon: { icon: 'tabler-book' },
     children: [
       { title: 'Requests', to: 'apps-approvals' },
-      { title: 'History', to: 'apps-approvals-approval-history' },
-      { title: 'Submit', to: 'apps-approvals-submit-request' },
+      { title: 'History', to: 'apps-approvals-history' },
+      { title: 'Submit', to: 'apps-approvals-submit' },
       { title: 'View', to: { name: 'apps-approvals-view-id', params: { id: 10 } } },
     ],
   },
