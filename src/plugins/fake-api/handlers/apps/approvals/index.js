@@ -13,4 +13,12 @@ export const handlerApprovalRequests = [
     
     return res(ctx.status(200), ctx.json({ approvalRequests }))
   }),
+
+  rest.get(('/api/approval/details/:id'), (req, res, ctx) => {
+    const approvalId = req.params.id
+    const approvalDetails = db.approvalRequests.find(approval => (approval._id.includes(approvalId)))
+  
+    return res(ctx.status(200), ctx.json({ approvalDetails }))
+  }),
+  
 ]

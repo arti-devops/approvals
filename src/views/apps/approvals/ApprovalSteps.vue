@@ -1,44 +1,73 @@
 <script setup>
-const logisticData = ref([
+const props = defineProps({
+  stepData: {
+    type: Object,
+    required: true,
+  },
+})
+
+const approvalDetails = props.stepData.approvalDetails
+const approvals = props.stepData.approvalDetails.approvals
+
+const transformApprovalToStepCards = approval => {
+  let icon, color, title, value
+
+  switch (approval.status) {
+  case "disapproved":
+    icon = 'tabler-exclamation-circle'
+    color = 'error'
+    title = approval.userEmail
+    value = "Revoqué"
+    break
+
+  case "pending":
+    icon = 'tabler-circle-dot'
+    color = 'warning'
+    title = approval.userEmail
+    value = "Pending"
+    break
+    
+  case "approved":
+    icon = 'tabler-location'
+    color = 'success'
+    title = approval.userEmail
+    value = "Approuvé"
+    break
+
+    // Add more cases for other status values if needed
+
+  default:
+    icon = 'tabler-user'
+    color = 'primary'
+    title = 'Default Title'
+    value = "Default Value"
+  }
+
+  return {
+    icon,
+    color,
+    title,
+    value,
+    isHover: false,
+  }
+}
+
+const transformedData = [  // Add your additional element here
   {
     icon: 'tabler-user',
     color: 'primary',
-    title: 'Alexy SANO',
+    title: approvalDetails.createdBy,
     value: "Initiateur",
-    change: 18.2,
     isHover: false,
   },
-  {
-    icon: 'tabler-location',
-    color: 'success',
-    title: 'Gren CISSE Al-Karid',
-    value: "Approuvé",
-    change: -8.7,
-    isHover: false,
-  },
-  {
-    icon: 'tabler-circle-dot',
-    color: 'warning',
-    title: 'Djiré Lamine',
-    value: "Pending",
-    change: 4.3,
-    isHover: false,
-  },
-  {
-    icon: 'tabler-circle-dot',
-    color: 'warning',
-    title: 'Sahiri Gbadié',
-    value: "Pending",
-    change: -2.5,
-    isHover: false,
-  },
-])
+  ...approvals.map(transformApprovalToStepCards),
+]
 </script>
 
 <template>
   <VRow>
     <VCol
-      v-for="(data, index) in logisticData"
+      v-for="(data, index) in transformedData"
       :key="index"
       cols="12"
       md="3"
