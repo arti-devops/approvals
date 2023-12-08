@@ -7,6 +7,8 @@ const props = defineProps({
 })
 
 const approvalDetails = props.approvalDetails.approvalDetails
+const textareaValue = ref('')
+const userWantToRevoke = ref(false)
 
 const resolveStatusIcon = status => {
   if (status === "pending") return { icon: "tabler-circle-dot", color: "warning", text: "Pending" }
@@ -24,6 +26,10 @@ const approvalStatusinfo = {
 
 const formControl = {
   isFormValid: !(approvalDetails.status === "pending"),
+}
+
+const userWantToRevokeAction = () => {
+  userWantToRevoke.value = true
 }
 
 console.log(formControl)
@@ -55,7 +61,7 @@ console.log(formControl)
   <VRow>
     <VCol
       cols="12"
-      md="8"
+      md="7"
     >
       <VCard>
         <VCardText class="d-flex align-center flex-wrap gap-4">
@@ -112,7 +118,7 @@ console.log(formControl)
     </VCol>
     <VCol
       cols="12"
-      md="4"
+      md="5"
     >
       <VCard class="text-center">
         <VCardText class="d-flex flex-column justify-center align-center">
@@ -133,11 +139,22 @@ console.log(formControl)
           </h6>
         </VCardText>
 
+        <VCardText v-if="userWantToRevoke">
+          <AppTextarea
+            v-model="textareaValue"
+            label="Justificatif de désapprobation"
+            placeholder="Saisissez votre justificatif de désapprobation"
+            auto-grow
+            :rules="[requiredValidator]"
+          />
+        </VCardText>
+
         <VCardText class="justify-center">
           <VBtn
             variant="elevated"
             color="error"
             :disabled="formControl.isFormValid"
+            @click="userWantToRevokeAction"
           >
             Désapprouver
           </VBtn>
