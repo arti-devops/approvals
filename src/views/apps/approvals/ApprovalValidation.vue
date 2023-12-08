@@ -32,6 +32,44 @@ const userWantToRevokeAction = () => {
   userWantToRevoke.value = true
 }
 
+// FILE UPLOAD
+const file = ref()
+
+const uploadFile = async () => {
+  if (!file.value) {
+    console.error('No file selected.')
+    
+    return
+  }
+
+  const formData = new FormData()
+
+  formData.append('file', file.value)
+
+  try {
+    // POTENTIAL SOURCCE OF ERROR
+    const response = await fetch('http://127.0.0.1:8000/uploadfile/', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Accept': 'application/json',
+      },
+    })
+
+    const data = await response.json()
+
+    console.log('File uploaded successfully:', data)
+  } catch (error) {
+    console.error('Error uploading file:', error)
+  }
+}
+
+const showFile = () => {
+  console.log(file.value)
+}
+
+// END FILE UPLOAD
+
 console.log(formControl)
 
 // Hello
@@ -94,6 +132,7 @@ console.log(formControl)
                 md="12"
               >
                 <VFileInput
+                  v-model="file"
                   label="Document signé"
                   :rules="[requiredValidator]"
                   :disabled="formControl.isFormValid"
@@ -105,7 +144,7 @@ console.log(formControl)
                   <VBtn
                     type="submit"
                     :disabled="formControl.isFormValid"
-                    @click="refForm?.validate()"
+                    @click="showFile"
                   >
                     Valider
                   </VBtn>
