@@ -1,17 +1,16 @@
 <script setup>
-import googleHome from '@images/pages/google-home.png'
-import iphone11 from '@images/pages/iphone-11.png'
+import currentDateTimeMongoDbStyle from "@/utils/helpers"
 
 const currentStep = ref(0)
 const refDocumentInfoForm = ref()
 const refValidationInfoForm = ref()
-const refConfirmationInfoForm = ref()
 const isCurrentStepValid = ref(true)
+const userSubmitedTheForm = ref(false)
 
 const documentInfoForm = ref({
-  type: 'Title',
+  type: null,
   title: 'File',
-  file: '',
+  file: null,
 })
 
 // For 3 levels of validation
@@ -19,10 +18,6 @@ const validationInfoForm = ref({
   validation1: 'head 1',
   validation2: 'head 2',
   validation3: 'head 3',
-})
-
-const ConfirmationInfoForm = ref({
-  userCanConfirm: false,
 })
 
 // Forms Validation logic codes
@@ -48,6 +43,41 @@ const validateValidationInfoForm = () => {
   })
 }
 
+const handleFileChange = event => {
+  let selectedFile = event.target.files[0]
+  documentInfoForm.value.file = selectedFile
+}
+
+const submitForValidation = () => {
+  userSubmitedTheForm.value = true
+  let validationLevels = []
+  for(const d of selectedDocumentType.value.validation){
+    validationLevels.push({
+      userOrder: d.level.replace(/\D/g, ""),
+      userEmail: validationInfoForm.value[d.level],
+      status: 'pending',
+      fileName: null,
+      signedAt: null,
+      comment: null,
+    })
+  }
+
+  const data = {
+    title: documentInfoForm.value.title,
+    status: 'pending',
+    signCounter: 0,
+    documentName: documentInfoForm.value.file.name, // Should get the doc link
+    documentType: documentInfoForm.value.type,
+    lastApproved: null, // Link of lastApproved Document
+    createdBy: "jk.feige@fotki.com", // Retrive Current user
+    createdAt: currentDateTimeMongoDbStyle(),
+    disapprovedFor: null,
+    approvals: validationLevels,
+  }
+
+  console.log(data)
+}
+
 const checkoutSteps = [
   {
     title: 'Document',
@@ -63,53 +93,6 @@ const checkoutSteps = [
   },
 ]
 
-const checkoutData = ref({
-  cartItems: [
-    {
-      id: 1,
-      name: 'Google - Google Home - White',
-      seller: 'Google',
-      inStock: true,
-      rating: 4,
-      price: 299,
-      discountPrice: 359,
-      image: googleHome,
-      quantity: 1,
-      estimatedDelivery: '18th Nov 2021',
-    },
-    {
-      id: 2,
-      name: 'Apple iPhone 11 (64GB, Black)',
-      seller: 'Apple',
-      inStock: true,
-      rating: 4,
-      price: 899,
-      discountPrice: 999,
-      image: iphone11,
-      quantity: 1,
-      estimatedDelivery: '20th Nov 2021',
-    },
-  ],
-  promoCode: '',
-  orderAmount: 1198,
-  deliveryAddress: 'home',
-  deliverySpeed: 'free',
-  deliveryCharges: 0,
-  addresses: [
-    {
-      title: 'John Doe (Default)',
-      desc: '4135 Parkway Street, Los Angeles, CA, 90017',
-      subtitle: '1234567890',
-      value: 'home',
-    },
-    {
-      title: 'ACME Inc.',
-      desc: '87 Hoffman Avenue, New York, NY, 10016',
-      subtitle: '1234567890',
-      value: 'office',
-    },
-  ],
-})
 
 // Config file to export
 const documentType = [
@@ -171,8 +154,18 @@ const documentType = [
   },
 ]
 
-const doctype = "vacancy"
-const selectedDocumentType = documentType.filter(item => item.type === doctype)[0]
+// Check selected Doc type value
+//const doctype = "vacancy"
+//const selectedDocumentType = documentType.filter(item => item.type === doctype)[0]
+// Computed property to dynamically compute selectedDocumentType
+const selectedDocumentType = computed(() => {
+  return documentType.find(item => item.type === documentInfoForm.value.type) || null
+})
+
+
+const logData = () => {
+  console.log(documentInfoForm.value)
+}
 </script>
 
 <template>
@@ -213,7 +206,7 @@ const selectedDocumentType = documentType.filter(item => item.type === doctype)[
                         <VCardText>
                           <AppSelect
                             v-model="documentInfoForm.type"
-                            :items="[{title:'Note', value:'note'},{title:'Congés/Absences', value:'vacancy'}]"
+                            :items="documentType.map(item => ({ title: item.title, value: item.type }))"
                             item-title="title"
                             item-value="value"
                             placeholder="Type du document"
@@ -233,13 +226,17 @@ const selectedDocumentType = documentType.filter(item => item.type === doctype)[
                           <VFileInput
                             label="Pièce jointe"
                             :rules="[requiredValidator]"
+                            @change="handleFileChange"
                           />
                         </VCardText>
                       </VCol>
 
                       <VCol cols="4">
                         <VCardText>
-                          <VBtn type="submit">
+                          <VBtn
+                            type="submit"
+                            @click="logData"
+                          >
                             Suivant
                           </VBtn>
                         </VCardText>
@@ -319,7 +316,7 @@ const selectedDocumentType = documentType.filter(item => item.type === doctype)[
           <VCard class="text-center">
             <VCardText class="d-flex flex-column justify-center align-center">
               <VAvatar
-                color="primary"
+                :color="userSubmitedTheForm ? 'success' : 'primary'"
                 variant="tonal"
                 size="50"
                 class="mb-4"
@@ -331,13 +328,17 @@ const selectedDocumentType = documentType.filter(item => item.type === doctype)[
               </VAvatar>
 
               <h6 class="text-h6">
-                Réfuser de signer
+                {{ userSubmitedTheForm ? 'Document envoyé !':'Envoyer le document pour validation' }}
               </h6>
             </VCardText>
 
             <VCardText class="justify-center">
-              <VBtn>
-                Envoyer
+              <VBtn
+                :color="userSubmitedTheForm ? 'success':'primary'"
+                :disabled="userSubmitedTheForm"
+                @click="submitForValidation"
+              >
+                {{ userSubmitedTheForm ? 'Envoyé !':'Envoyer' }}
                 <VIcon
                   end
                   icon="tabler-send"
@@ -350,6 +351,7 @@ const selectedDocumentType = documentType.filter(item => item.type === doctype)[
                   <VBtn
                     color="secondary"
                     variant="tonal"
+                    :disabled="userSubmitedTheForm"
                     @click="currentStep--"
                   >
                     <VIcon
@@ -358,6 +360,18 @@ const selectedDocumentType = documentType.filter(item => item.type === doctype)[
                       class="flip-in-rtl"
                     />
                     Précédant
+                  </VBtn>
+                  <VBtn
+                    v-if="userSubmitedTheForm"
+                    color="error"
+                    :to="{ name: 'apps-approvals'}"
+                  >
+                    Quiter
+                    <VIcon
+                      icon="tabler-door-exit"
+                      end
+                      class="flip-in-rtl"
+                    />
                   </VBtn>
                 </div>
               </VCol>
