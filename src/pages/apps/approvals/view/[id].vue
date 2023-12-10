@@ -1,25 +1,34 @@
 <script setup>
-import ApprovalSteps from '@/views/apps/approvals/ApprovalSteps.vue'
 import ApprovalValidation from '@/views/apps/approvals/ApprovalValidation.vue'
 
 const route = useRoute('apps-approvals-view-id')
 
-const { data: approvalDetails } = await useApi(createUrl(`/approval/details/${ route.params.id }`))
+const approvalDetails = ref({})
+
+let { data } = await useApi(createUrl(`/approval/details/${ route.params.id }`))
+
+approvalDetails.value = data
+
+//Receive update
+const onApprovalDetailsUpdated = updatedApprovalDetails => {
+  console.log("CURRENT DATA")
+  console.log(data.value)
+  console.log("NEW VALUE OF DATA")
+  data = updatedApprovalDetails
+  console.log(data)
+}
 </script>
 
 <template>
   <VRow
-    v-if="approvalDetails"
+    v-if="data"
     class="match-height"
   >
     <VCol cols="12">
-      <ApprovalSteps :step-data="approvalDetails" />
-    </VCol>
-    <VCol cols="12">
-      <h2>Validation du Document</h2>
-    </VCol>
-    <VCol cols="12">
-      <ApprovalValidation :approval-details="approvalDetails" />
+      <ApprovalValidation
+        :approval-details="data"
+        @update-approval-details="onApprovalDetailsUpdated"
+      />
     </VCol>
   </VRow>
 </template>

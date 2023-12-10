@@ -1,4 +1,6 @@
 <script setup>
+import currentDateTimeMongoDbStyle from '@/utils/helpers'
+
 const props = defineProps({
   approvalDetails: {
     type: Object,
@@ -6,9 +8,33 @@ const props = defineProps({
   },
 })
 
-const approvalDetails = props.approvalDetails.approvalDetails
-const textareaValue = ref('')
+
+// EMIT UPDATE EVENT
+const emitUpdate = defineEmits(['updateApprovalDetails'])
+
+const updateApprovalDetails = updatedApprovalDetails => {
+  emitUpdate('updateApprovalDetails', updatedApprovalDetails)
+}
+
+
+const approvalDetails = ref(props.approvalDetails.approvalDetails).value
+const approvals = ref(props.approvalDetails.approvalDetails.approvals).value
+const revocationComment = ref('')
 const userWantToRevoke = ref(false)
+
+// VALIDATION NOTIFICATIONS
+const isSnackbarSuccessVisible = ref(false)
+const isSnackbarErrorVisible = ref(false)
+const isSnackbarRevokVisible = ref(false)
+
+
+// SUBMIT AND FORM CONTROL
+const isFormValid = ref(!(approvalDetails.status === 'pending'))
+
+//TEST AREA TO REMOVE
+//const userEmail = 'alice.zhanne@youtube.com'
+const userEmail = 'amc.ginnell@lulu.com'
+
 
 const resolveStatusIcon = status => {
   if (status === "pending") return { icon: "tabler-circle-dot", color: "warning", text: "Pending" }
@@ -18,20 +44,33 @@ const resolveStatusIcon = status => {
   return "tabler-user"
 }
 
-const approvalStatusinfo = {
-  icon: resolveStatusIcon(approvalDetails.status).icon,
-  color: resolveStatusIcon(approvalDetails.status).color,
-  value: resolveStatusIcon(approvalDetails.status).text,
-}
-
-const formControl = {
-  isFormValid: !(approvalDetails.status === "pending"),
-}
+const approvalStatusinfo = computed(() => {
+  return resolveStatusIcon(approvalDetails.status)
+})
 
 const userWantToRevokeAction = () => {
-  userWantToRevoke.value = true
+  if (!userWantToRevoke.value || revocationComment.value == '') {
+    userWantToRevoke.value = true
+  }else{
+    const userApproval = approvalDetails.approvals.find(approval => approval.userEmail == userEmail)
+
+    isFormValid.value = true
+    if (userApproval){
+      userApproval.status = 'disapproved'
+      userApproval.comment = revocationComment.value
+      userApproval.signedAt = currentDateTimeMongoDbStyle()
+      isSnackbarRevokVisible.value = true
+      updateApprovalDetails(approvalDetails)
+      approvalDetails.status = 'disapproved'
+      userWantToRevoke.value = false
+    }
+
+    console.log(approvalDetails)
+  }
 }
 
+// FILE UPLOAD
+// FILE UPLOAD
 // FILE UPLOAD
 const file = ref()
 
@@ -42,40 +81,144 @@ const uploadFile = async () => {
     return
   }
 
-  const formData = new FormData()
+  const { data: uploadResponse } = await useApi(createUrl("/approval/uploadfile"))
 
-  formData.append('file', file.value)
-
-  try {
-    // POTENTIAL SOURCCE OF ERROR
-    const response = await fetch('http://127.0.0.1:8000/uploadfile/', {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'Accept': 'application/json',
-      },
-    })
-
-    const data = await response.json()
-
-    console.log('File uploaded successfully:', data)
-  } catch (error) {
-    console.error('Error uploading file:', error)
+  if (uploadResponse.value.response.code == 200) {
+    const userApproval = approvalDetails.approvals.find(approval => approval.userEmail == userEmail)
+    if (userApproval){
+      userApproval.status = 'approved'
+      userApproval.fileName = uploadResponse.value.response.link
+      userApproval.signedAt = currentDateTimeMongoDbStyle()
+      approvalDetails.signCounter = approvalDetails.signCounter + 1
+      if (approvalDetails.signCounter == approvalDetails.approvals.length){
+        approvalDetails.status = 'approved'
+      }
+      approvalDetails.lastApproved = userApproval.fileName
+      updateApprovalDetails(approvalDetails)
+    }
+    isFormValid.value = true
+    isSnackbarSuccessVisible.value = true
+    console.log(approvalDetails)
   }
-}
+  else{
+    isSnackbarErrorVisible.value = true
+  }
 
-const showFile = () => {
-  console.log(file.value)
 }
 
 // END FILE UPLOAD
+// END FILE UPLOAD
+// END FILE UPLOAD
 
-console.log(formControl)
+// VALIDATION STEPS
+// VALIDATION STEPS
+// VALIDATION STEPS
+const transformApprovalToStepCards = approval => {
+  let icon, color, title, value
 
-// Hello
+  switch (approval.status) {
+  case "disapproved":
+    icon = 'tabler-exclamation-circle'
+    color = 'error'
+    title = approval.userEmail
+    value = "Revoqué"
+    break
+
+  case "pending":
+    icon = 'tabler-circle-dot'
+    color = 'warning'
+    title = approval.userEmail
+    value = "Pending"
+    break
+    
+  case "approved":
+    icon = 'tabler-location'
+    color = 'success'
+    title = approval.userEmail
+    value = "Approuvé"
+    break
+
+    // Add more cases for other status values if needed
+
+  default:
+    icon = 'tabler-user'
+    color = 'primary'
+    title = 'Default Title'
+    value = "Default Value"
+  }
+
+  return {
+    icon,
+    color,
+    title,
+    value,
+    isHover: false,
+  }
+}
+
+const transformedData = computed(() => {
+  return [  // Add your additional element here
+    {
+      icon: 'tabler-user',
+      color: 'primary',
+      title: approvalDetails.createdBy,
+      value: "Initiateur",
+      isHover: false,
+    },
+    ...approvals.map(transformApprovalToStepCards),
+  ]
+})
 </script>
 
 <template>
+  <!-- VALIDATION STEPS -->
+  <!-- VALIDATION STEPS -->
+  <!-- VALIDATION STEPS -->
+  <VRow>
+    <VCol
+      v-for="(data, index) in transformedData"
+      :key="index"
+      cols="12"
+      md="3"
+      sm="6"
+    >
+      <div>
+        <VCard
+          class="logistics-card-statistics cursor-pointer"
+          :style="data.isHover ? { 'border-block-end': `2px solid rgba(var(--v-theme-${data.color}))` } : { 'border-block-end': `2px solid rgba(var(--v-theme-${data.color}), var(--v-disabled-opacity))` }"
+          @mouseenter="data.isHover = true"
+          @mouseleave="data.isHover = false"
+        >
+          <VCardText>
+            <div class="d-flex align-center gap-x-4 mb-2">
+              <VAvatar
+                variant="tonal"
+                :color="data.color"
+                rounded
+              >
+                <VIcon
+                  :icon="data.icon"
+                  size="28"
+                />
+              </VAvatar>
+              <h5 class="text-h5 font-weight-medium">
+                {{ data.value }}
+              </h5>
+            </div>
+            <div class="text-body-1">
+              {{ data.title }}
+            </div>
+          </VCardText>
+        </VCard>
+      </div>
+    </VCol>
+  </VRow>
+  <VRow>
+    <VCol cols="12">
+      <h2>Validation du Document</h2>
+    </VCol>
+  </VRow>
+  <!-- ESPACE DETAILS -->
   <VRow>
     <VCol cols="12">
       <div style="margin-inline-start: 5px;">
@@ -84,7 +227,7 @@ console.log(formControl)
           :color="approvalStatusinfo.color"
           size="small"
         />
-        <span class="mx-1">Status: {{ approvalStatusinfo.value }}</span>
+        <span class="mx-1">Status: {{ approvalStatusinfo.text }}</span>
       </div>
       <div>
         <VAvatar icon="tabler-home" />
@@ -96,6 +239,9 @@ console.log(formControl)
       </div>
     </VCol>
   </VRow>
+  <!-- ESPACE VALIDATION -->
+  <!-- ESPACE VALIDATION -->
+  <!-- ESPACE VALIDATION -->
   <VRow>
     <VCol
       cols="12"
@@ -112,13 +258,18 @@ console.log(formControl)
 
           <div class="d-flex align-center flex-wrap gap-4">
             <!-- 👉 Export invoice -->
-            <VBtn
-              prepend-icon="tabler-paperclip"
-              variant="tonal"
-              color="secondary"
+            <a
+              about="_blank"
+              :href="approvalDetails.lastApproved ? approvalDetails.lastApproved : approvalDetails.documentName "
             >
-              Voir le document
-            </VBtn>
+              <VBtn
+                prepend-icon="tabler-file-filled"
+                variant="tonal"
+                color="secondary"
+              >
+                Document
+              </VBtn>
+            </a>
           </div>
         </VCardText>
         <VCardText class="justify-center">
@@ -133,9 +284,9 @@ console.log(formControl)
               >
                 <VFileInput
                   v-model="file"
-                  label="Document signé"
+                  label="Pièce jointe"
                   :rules="[requiredValidator]"
-                  :disabled="formControl.isFormValid"
+                  :disabled="isFormValid"
                 />
               </VCol>
 
@@ -143,10 +294,14 @@ console.log(formControl)
                 <VCardText class="d-flex flex-column justify-center align-center">
                   <VBtn
                     type="submit"
-                    :disabled="formControl.isFormValid"
-                    @click="showFile"
+                    :disabled="isFormValid"
+                    @click="uploadFile"
                   >
                     Valider
+                    <VIcon
+                      end
+                      icon="tabler-checkbox"
+                    />
                   </VBtn>
                 </VCardText>
               </VCol>
@@ -155,50 +310,107 @@ console.log(formControl)
         </VCardText>
       </VCard>
     </VCol>
+    <!-- ESPACE REVOCATION -->
+    <!-- ESPACE REVOCATION -->
+    <!-- ESPACE REVOCATION -->
     <VCol
       cols="12"
       md="5"
     >
       <VCard class="text-center">
-        <VCardText class="d-flex flex-column justify-center align-center">
-          <VAvatar
-            color="error"
-            variant="tonal"
-            size="50"
-            class="mb-4"
-          >
-            <VIcon
-              size="2rem"
-              icon="tabler-alert-triangle"
+        <VCardText class="d-flex align-center flex-wrap gap-4">
+          <!-- 👉 Actions  -->
+          <div class="me-3 d-flex gap-3">
+            <h3>Espace de révocation</h3>
+          </div>
+        </VCardText>
+
+        <VForm>
+          <VCardText class="d-flex flex-column justify-center align-center">
+            <VAvatar
+              color="error"
+              variant="tonal"
+              size="50"
+              class="mb-4"
+            >
+              <VIcon
+                size="2rem"
+                icon="tabler-alert-triangle"
+              />
+            </VAvatar>
+
+            <h6 class="text-h6">
+              Réfuser de valider
+            </h6>
+          </VCardText>
+
+          <VCardText v-if="userWantToRevoke">
+            <AppTextarea
+              v-model="revocationComment"
+              label="Justificatif de désapprobation"
+              placeholder="Saisissez votre justificatif de désapprobation"
+              auto-grow
+              :rules="[requiredValidator]"
             />
-          </VAvatar>
+          </VCardText>
 
-          <h6 class="text-h6">
-            Réfuser de signer
-          </h6>
-        </VCardText>
-
-        <VCardText v-if="userWantToRevoke">
-          <AppTextarea
-            v-model="textareaValue"
-            label="Justificatif de désapprobation"
-            placeholder="Saisissez votre justificatif de désapprobation"
-            auto-grow
-            :rules="[requiredValidator]"
-          />
-        </VCardText>
-
-        <VCardText class="justify-center">
-          <VBtn
-            variant="elevated"
-            color="error"
-            :disabled="formControl.isFormValid"
-            @click="userWantToRevokeAction"
-          >
-            Désapprouver
-          </VBtn>
-        </VCardText>
+          <VCardText class="justify-center">
+            <VBtn
+              type="submit"
+              variant="elevated"
+              color="error"
+              :disabled="isFormValid"
+              @click="userWantToRevokeAction"
+            >
+              Révoquer
+              <VIcon
+                end
+                icon="tabler-file-minus"
+              />
+            </VBtn>
+          </VCardText>
+        </VForm>
       </VCard>
     </VCol>
   </VRow>
+  <VSnackbar
+    v-model="isSnackbarSuccessVisible"
+    location="bottom"
+    tonal="flat"
+    color="success"
+  >
+    <VAlert type="success">
+      Validation réussie.
+    </VAlert>
+  </Vsnackbar>
+  <VSnackbar
+    v-model="isSnackbarErrorVisible"
+    location="bottom"
+    tonal="flat"
+    color="warning"
+  >
+    <VAlert type="warning">
+      La validation a échoué. Veuillez reéssayer !
+    </VAlert>
+  </VSnackbar>
+  <VSnackbar
+    v-model="isSnackbarRevokVisible"
+    location="bottom"
+    tonal="flat"
+    color="info"
+  >
+    <VAlert type="info">
+      Vous avez révoqué ce document !
+    </VAlert>
+  </VSnackbar>
 </template>
+
+<style lang="scss" scoped>
+@use "@core/scss/base/mixins" as mixins;
+
+.logistics-card-statistics:hover {
+  @include mixins.elevation(12);
+
+  transition: all 0.1s ease-out;
+}
+</style>

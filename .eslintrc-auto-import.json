@@ -351,6 +351,13 @@
     "watchTriggerable": true,
     "watchWithFilter": true,
     "whenever": true,
-    "useClipboardItems": true
+    "useClipboardItems": true,
+    "cu": true,
+    "current": true,
+    "currentDateTime": true,
+    "currentDateTimeMongoDBS": true,
+    "currentDateTimeMongoDBStyle": true,
+    "currentDateTimeMongoDbStyle": true,
+    "helpers": true
   }
 }
