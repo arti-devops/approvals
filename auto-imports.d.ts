@@ -54,8 +54,15 @@ declare global {
   const effectScope: typeof import('vue')['effectScope']
   const emailValidator: typeof import('./src/@core/utils/validators.js')['emailValidator']
   const extendRef: typeof import('@vueuse/core')['extendRef']
+  const extractAndCapitalizeNamesFromEmail: typeof import('./src/utils/helpers.js')['extractAndCapitalizeNamesFromEmail']
+  const extractNamesFromEmail: typeof import('./src/utils/helpers.js')['extractNamesFromEmail']
   const formatDate: typeof import('./src/@core/utils/formatters.js')['formatDate']
+  const formatDateAgo: typeof import('./src/utils/helpers.js')['formatDateAgo']
+  const formatDateAgoExtended: typeof import('./src/utils/helpers.js')['formatDateAgoExtended']
+  const formatDateAgoShort: typeof import('./src/utils/helpers.js')['formatDateAgoShort']
+  const formatDateFr: typeof import('./src/utils/helpers.js')['formatDateFr']
   const formatDateToMonthShort: typeof import('./src/@core/utils/formatters.js')['formatDateToMonthShort']
+  const formatDatef: typeof import('./src/utils/helpers.js')['formatDatef']
   const getActivePinia: typeof import('pinia')['getActivePinia']
   const getCurrentInstance: typeof import('vue')['getCurrentInstance']
   const getCurrentScope: typeof import('vue')['getCurrentScope']
@@ -395,6 +402,7 @@ declare module 'vue' {
     readonly createTemplatePromise: UnwrapRef<typeof import('@vueuse/core')['createTemplatePromise']>
     readonly createUnrefFn: UnwrapRef<typeof import('@vueuse/core')['createUnrefFn']>
     readonly createUrl: UnwrapRef<typeof import('./src/@core/composable/createUrl.js')['createUrl']>
+    readonly currentDateTimeMongoDbStyle: UnwrapRef<typeof import('./src/utils/helpers.js')['currentDateTimeMongoDbStyle']>
     readonly customRef: UnwrapRef<typeof import('vue')['customRef']>
     readonly debouncedRef: UnwrapRef<typeof import('@vueuse/core')['debouncedRef']>
     readonly debouncedWatch: UnwrapRef<typeof import('@vueuse/core')['debouncedWatch']>
@@ -407,13 +415,15 @@ declare module 'vue' {
     readonly effectScope: UnwrapRef<typeof import('vue')['effectScope']>
     readonly emailValidator: UnwrapRef<typeof import('./src/@core/utils/validators.js')['emailValidator']>
     readonly extendRef: UnwrapRef<typeof import('@vueuse/core')['extendRef']>
+    readonly extractNamesFromEmail: UnwrapRef<typeof import('./src/utils/helpers.js')['extractNamesFromEmail']>
     readonly formatDate: UnwrapRef<typeof import('./src/@core/utils/formatters.js')['formatDate']>
+    readonly formatDateAgoExtended: UnwrapRef<typeof import('./src/utils/helpers.js')['formatDateAgoExtended']>
+    readonly formatDateFr: UnwrapRef<typeof import('./src/utils/helpers.js')['formatDateFr']>
     readonly formatDateToMonthShort: UnwrapRef<typeof import('./src/@core/utils/formatters.js')['formatDateToMonthShort']>
     readonly getActivePinia: UnwrapRef<typeof import('pinia')['getActivePinia']>
     readonly getCurrentInstance: UnwrapRef<typeof import('vue')['getCurrentInstance']>
     readonly getCurrentScope: UnwrapRef<typeof import('vue')['getCurrentScope']>
     readonly h: UnwrapRef<typeof import('vue')['h']>
-    readonly helpers: UnwrapRef<typeof import('./src/utils/helpers.js')['default']>
     readonly ignorableWatch: UnwrapRef<typeof import('@vueuse/core')['ignorableWatch']>
     readonly inject: UnwrapRef<typeof import('vue')['inject']>
     readonly injectLocal: UnwrapRef<typeof import('@vueuse/core')['injectLocal']>
@@ -741,6 +751,7 @@ declare module '@vue/runtime-core' {
     readonly createTemplatePromise: UnwrapRef<typeof import('@vueuse/core')['createTemplatePromise']>
     readonly createUnrefFn: UnwrapRef<typeof import('@vueuse/core')['createUnrefFn']>
     readonly createUrl: UnwrapRef<typeof import('./src/@core/composable/createUrl.js')['createUrl']>
+    readonly currentDateTimeMongoDbStyle: UnwrapRef<typeof import('./src/utils/helpers.js')['currentDateTimeMongoDbStyle']>
     readonly customRef: UnwrapRef<typeof import('vue')['customRef']>
     readonly debouncedRef: UnwrapRef<typeof import('@vueuse/core')['debouncedRef']>
     readonly debouncedWatch: UnwrapRef<typeof import('@vueuse/core')['debouncedWatch']>
@@ -753,13 +764,15 @@ declare module '@vue/runtime-core' {
     readonly effectScope: UnwrapRef<typeof import('vue')['effectScope']>
     readonly emailValidator: UnwrapRef<typeof import('./src/@core/utils/validators.js')['emailValidator']>
     readonly extendRef: UnwrapRef<typeof import('@vueuse/core')['extendRef']>
+    readonly extractNamesFromEmail: UnwrapRef<typeof import('./src/utils/helpers.js')['extractNamesFromEmail']>
     readonly formatDate: UnwrapRef<typeof import('./src/@core/utils/formatters.js')['formatDate']>
+    readonly formatDateAgoExtended: UnwrapRef<typeof import('./src/utils/helpers.js')['formatDateAgoExtended']>
+    readonly formatDateFr: UnwrapRef<typeof import('./src/utils/helpers.js')['formatDateFr']>
     readonly formatDateToMonthShort: UnwrapRef<typeof import('./src/@core/utils/formatters.js')['formatDateToMonthShort']>
     readonly getActivePinia: UnwrapRef<typeof import('pinia')['getActivePinia']>
     readonly getCurrentInstance: UnwrapRef<typeof import('vue')['getCurrentInstance']>
     readonly getCurrentScope: UnwrapRef<typeof import('vue')['getCurrentScope']>
     readonly h: UnwrapRef<typeof import('vue')['h']>
-    readonly helpers: UnwrapRef<typeof import('./src/utils/helpers.js')['default']>
     readonly ignorableWatch: UnwrapRef<typeof import('@vueuse/core')['ignorableWatch']>
     readonly inject: UnwrapRef<typeof import('vue')['inject']>
     readonly injectLocal: UnwrapRef<typeof import('@vueuse/core')['injectLocal']>

@@ -358,6 +358,13 @@
     "currentDateTimeMongoDBS": true,
     "currentDateTimeMongoDBStyle": true,
     "currentDateTimeMongoDbStyle": true,
-    "helpers": true
+    "helpers": true,
+    "formatDateAgo": true,
+    "extractNamesFromEmail": true,
+    "extractAndCapitalizeNamesFromEmail": true,
+    "formatDateAgoShort": true,
+    "formatDateAgoExtended": true,
+    "formatDatef": true,
+    "formatDateFr": true
   }
 }

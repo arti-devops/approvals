@@ -3,20 +3,7 @@ import ApprovalValidation from '@/views/apps/approvals/ApprovalValidation.vue'
 
 const route = useRoute('apps-approvals-view-id')
 
-const approvalDetails = ref({})
-
 let { data } = await useApi(createUrl(`/approval/details/${ route.params.id }`))
-
-approvalDetails.value = data
-
-//Receive update
-const onApprovalDetailsUpdated = updatedApprovalDetails => {
-  console.log("CURRENT DATA")
-  console.log(data.value)
-  console.log("NEW VALUE OF DATA")
-  data = updatedApprovalDetails
-  console.log(data)
-}
 </script>
 
 <template>
@@ -25,10 +12,7 @@ const onApprovalDetailsUpdated = updatedApprovalDetails => {
     class="match-height"
   >
     <VCol cols="12">
-      <ApprovalValidation
-        :approval-details="data"
-        @update-approval-details="onApprovalDetailsUpdated"
-      />
+      <ApprovalValidation :approval-details="data" />
     </VCol>
   </VRow>
 </template>

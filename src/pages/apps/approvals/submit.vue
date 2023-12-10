@@ -1,5 +1,5 @@
 <script setup>
-import currentDateTimeMongoDbStyle from "@/utils/helpers"
+import { currentDateTimeMongoDbStyle } from "@/utils/helpers"
 
 const currentStep = ref(0)
 const refDocumentInfoForm = ref()

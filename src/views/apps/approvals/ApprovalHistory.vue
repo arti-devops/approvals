@@ -1,4 +1,5 @@
 <script setup>
+import { extractNamesFromEmail, formatDateAgoExtended } from '@/utils/helpers'
 import { VDataTableServer } from 'vuetify/labs/VDataTable'
 
 const approvalHeaders = [
@@ -85,6 +86,16 @@ const resolveApprovalRequestStatusVariant = item => {
           </VAvatar>
           <span class="text-capitalize">{{ resolveApprovalRequestStatusVariant(item).text }}</span>
         </div>
+      </template>
+
+      <!-- Soumis le -->
+      <template #item.createdBy="{ item }">
+        {{ extractNamesFromEmail(item.createdBy) }}
+      </template>
+
+      <!-- Soumis le -->
+      <template #item.createdAt="{ item }">
+        {{ formatDateAgoExtended(item.createdAt) }}
       </template>
 
       <!-- Actions -->

@@ -1,5 +1,5 @@
 <script setup>
-import currentDateTimeMongoDbStyle from '@/utils/helpers'
+import { currentDateTimeMongoDbStyle, extractNamesFromEmail, formatDateAgoExtended, formatDateFr } from '@/utils/helpers'
 
 const props = defineProps({
   approvalDetails: {
@@ -21,6 +21,9 @@ const approvalDetails = ref(props.approvalDetails.approvalDetails).value
 const approvals = ref(props.approvalDetails.approvalDetails.approvals).value
 const revocationComment = ref('')
 const userWantToRevoke = ref(false)
+
+//TODO check user data for revocation and update the view
+const userHasRevoked = ref(false)
 
 // VALIDATION NOTIFICATIONS
 const isSnackbarSuccessVisible = ref(false)
@@ -64,7 +67,7 @@ const userWantToRevokeAction = () => {
       approvalDetails.status = 'disapproved'
       userWantToRevoke.value = false
     }
-
+    userHasRevoked.value = true
     console.log(approvalDetails)
   }
 }
@@ -120,21 +123,21 @@ const transformApprovalToStepCards = approval => {
   case "disapproved":
     icon = 'tabler-exclamation-circle'
     color = 'error'
-    title = approval.userEmail
+    title = extractNamesFromEmail(approval.userEmail)
     value = "Revoqué"
     break
 
   case "pending":
     icon = 'tabler-circle-dot'
     color = 'warning'
-    title = approval.userEmail
+    title = extractNamesFromEmail(approval.userEmail)
     value = "Pending"
     break
     
   case "approved":
     icon = 'tabler-location'
     color = 'success'
-    title = approval.userEmail
+    title = extractNamesFromEmail(approval.userEmail)
     value = "Approuvé"
     break
 
@@ -161,7 +164,7 @@ const transformedData = computed(() => {
     {
       icon: 'tabler-user',
       color: 'primary',
-      title: approvalDetails.createdBy,
+      title: extractNamesFromEmail(approvalDetails.createdBy),
       value: "Initiateur",
       isHover: false,
     },
@@ -235,7 +238,7 @@ const transformedData = computed(() => {
       </div>
       <div>
         <VAvatar icon="tabler-calendar" />
-        <span>Soumis le : {{ approvalDetails.createdAt }}</span>
+        <span>Soumis le : {{ formatDateFr(approvalDetails.createdAt) }} ({{ formatDateAgoExtended(approvalDetails.createdAt) }})</span>
       </div>
     </VCol>
   </VRow>
@@ -340,7 +343,7 @@ const transformedData = computed(() => {
             </VAvatar>
 
             <h6 class="text-h6">
-              Réfuser de valider
+              {{ userHasRevoked? "Vous avez révoqué ce document": "Réfuser de valider" }}
             </h6>
           </VCardText>
 
@@ -362,7 +365,7 @@ const transformedData = computed(() => {
               :disabled="isFormValid"
               @click="userWantToRevokeAction"
             >
-              Révoquer
+              {{ userHasRevoked? "Révoqué": "Révoquer" }}
               <VIcon
                 end
                 icon="tabler-file-minus"

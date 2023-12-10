@@ -94,8 +94,17 @@ const resolveApprovalRequestProgress = item => {
         <VProgressLinear
           color="rgb(var(--v-theme-primary))"
           :model-value="resolveApprovalRequestProgress(item)"
-          striped
         />
+      </template>
+
+      <!-- Soumis le -->
+      <template #item.createdBy="{ item }">
+        {{ extractNamesFromEmail(item.createdBy) }}
+      </template>
+
+      <!-- Soumis le -->
+      <template #item.createdAt="{ item }">
+        {{ formatDateAgoExtended(item.createdAt) }}
       </template>
 
       <!-- Actions -->
