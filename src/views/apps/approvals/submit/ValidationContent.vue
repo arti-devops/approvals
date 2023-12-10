@@ -73,7 +73,6 @@ const documentType = [
   },
 ]
 
-
 const doctype = "vacancy"
 const selectedDocumentType = documentType.filter(item => item.type === doctype)[0]
 

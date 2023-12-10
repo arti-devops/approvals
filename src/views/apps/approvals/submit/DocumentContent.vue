@@ -15,17 +15,9 @@ const emit = defineEmits([
   'update:checkout-data',
 ])
 
+const refDocumentInfo = ref()
+
 const checkoutCartDataLocal = ref(props.checkoutData)
-
-const removeItem = item => {
-  checkoutCartDataLocal.value.cartItems = checkoutCartDataLocal.value.cartItems.filter(i => i.id !== item.id)
-}
-
-const totalCost = computed(() => {
-  return checkoutCartDataLocal.value.orderAmount = checkoutCartDataLocal.value.cartItems.reduce((acc, item) => {
-    return acc + item.price * item.quantity
-  }, 0)
-})
 
 const updateCartData = () => {
   emit('update:checkout-data', checkoutCartDataLocal.value)
