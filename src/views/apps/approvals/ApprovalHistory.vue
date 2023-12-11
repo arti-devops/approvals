@@ -1,5 +1,6 @@
 <script setup>
 import { extractNamesFromEmail, formatDateAgoExtended } from '@/utils/helpers'
+import axios from 'axios'
 import { VDataTableServer } from 'vuetify/labs/VDataTable'
 
 const approvalHeaders = [
@@ -29,10 +30,16 @@ const approvalHeaders = [
   },
 ]
 
-const {
-  data: approvalRequestsData,
-  execute: fetchApprovalrequests,
-} = await useApi(createUrl('/apps/approvalhistory', {}))
+const approvalRequestsData = shallowRef()
+
+//FIX Provide real link to db
+await axios.get('http://localhost:8000/approvals/requests')
+  .then(response => {
+    approvalRequestsData.value = { approvalRequests: response.data }
+    console.log(approvalRequestsData)
+    console.log(response.data)
+  })
+  .catch(error => { console.log(error)})
 
 const rdata = computed(() => approvalRequestsData.value.approvalRequests)
 
