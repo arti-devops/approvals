@@ -1,11 +1,13 @@
 <script setup>
-import { currentDateTimeMongoDbStyle } from "@/utils/helpers"
+import axios from 'axios'
 
 const currentStep = ref(0)
 const refDocumentInfoForm = ref()
 const refValidationInfoForm = ref()
 const isCurrentStepValid = ref(true)
 const userSubmitedTheForm = ref(false)
+const userSubmitedTheFormSuccessfully = ref(false)
+const isDocumentDuplicate = ref(false)
 
 const documentInfoForm = ref({
   type: null,
@@ -49,11 +51,11 @@ const handleFileChange = event => {
 }
 
 const submitForValidation = () => {
-  userSubmitedTheForm.value = true
+  // Create all approvers record based on DocumentType entries
   let validationLevels = []
   for(const d of selectedDocumentType.value.validation){
     validationLevels.push({
-      userOrder: d.level.replace(/\D/g, ""),
+      userOrder: d.level.replace(/\D/g, ""), // Take last number as user order
       userEmail: validationInfoForm.value[d.level],
       status: 'pending',
       fileName: null,
@@ -62,20 +64,43 @@ const submitForValidation = () => {
     })
   }
 
-  const data = {
-    title: documentInfoForm.value.title,
-    status: 'pending',
-    signCounter: 0,
-    documentName: documentInfoForm.value.file.name, // Should get the doc link
-    documentType: documentInfoForm.value.type,
-    lastApproved: null, // Link of lastApproved Document
-    createdBy: "jk.feige@fotki.com", // Retrive Current user
-    createdAt: currentDateTimeMongoDbStyle(),
-    disapprovedFor: null,
-    approvals: validationLevels,
-  }
+  // FormData to send file via HTTP
+  const formData = new FormData()
+  const filelink = ref('')
 
-  console.log(data)
+  formData.append("file", documentInfoForm.value.file)
+
+  //TODO The API Call //FIX Change API link
+  axios.post('http://localhost:8000/uploadfile', formData)
+    .then(response => {
+      // Disable the form when submit is successful
+      userSubmitedTheForm.value = true // Lock the form
+      userSubmitedTheFormSuccessfully.value = true // Display the snackbar
+      filelink.value = response.data.link
+      console.log('File uploaded successfully:', response.data)
+
+      // Generate the data to be sent to MongoDb
+      const data = {
+        title: documentInfoForm.value.title,
+        status: 'pending',
+        signCounter: 0,
+        documentName: filelink.value,
+        documentType: documentInfoForm.value.type,
+        lastApproved: null, // Link of lastApproved Document
+        createdBy: "jk.feige@fotki.com", //FIX get Current user from login info
+        createdAt: currentDateTimeMongoDbStyle(),
+        disapprovedFor: null,
+        approvals: validationLevels,
+      }
+
+      //TODO API Call : send data to db
+      console.log(data)
+    })
+    .catch(error => {
+      isDocumentDuplicate.value = true
+      console.error('Error uploading file:', error.response.data)
+    })
+
 }
 
 const checkoutSteps = [
@@ -94,7 +119,7 @@ const checkoutSteps = [
 ]
 
 
-// Config file to export
+//FIX Config file to export
 const documentType = [
   {
     type: "note",
@@ -162,7 +187,7 @@ const selectedDocumentType = computed(() => {
   return documentType.find(item => item.type === documentInfoForm.value.type) || null
 })
 
-
+//TODO REMOVE this code and deps
 const logData = () => {
   console.log(documentInfoForm.value)
 }
@@ -381,6 +406,26 @@ const logData = () => {
       </VWindow>
     </VCardText>
   </VCard>
+  <VSnackbar
+    v-model="isDocumentDuplicate"
+    location="top end"
+    tonal="flat"
+    color="warning"
+  >
+    <VAlert type="warning">
+      Une erreur est survenue. Veuillez reéssayer.<br>
+    </VAlert>
+  </VSnackbar>
+  <VSnackbar
+    v-model="userSubmitedTheFormSuccessfully"
+    location="top end"
+    tonal="flat"
+    color="success"
+  >
+    <VAlert type="success">
+      Votre document a été envoyé.<br>
+    </VAlert>
+  </VSnackbar>
 </template>
 
 <style lang="scss">
