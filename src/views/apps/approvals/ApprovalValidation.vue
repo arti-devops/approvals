@@ -35,8 +35,9 @@ const isSnackbarRevokVisible = ref(false)
 const isFormValid = ref(!(approvalDetails.status === 'pending'))
 
 //TEST AREA TO REMOVE
-//const userEmail = 'alice.zhanne@youtube.com'
-const userEmail = 'amc.ginnell@lulu.com'
+const userEmail = 'alice.zhanne@youtube.com'
+
+//const userEmail = 'amc.ginnell@lulu.com'
 
 
 const resolveStatusIcon = status => {
@@ -116,26 +117,32 @@ const uploadFile = async () => {
 // VALIDATION STEPS
 // VALIDATION STEPS
 // VALIDATION STEPS
+
+const userOrder = ['tabler-number-0', 'tabler-number-1', 'tabler-number-2', 'tabler-number-3', 'tabler-number-4']
+
 const transformApprovalToStepCards = approval => {
-  let icon, color, title, value
+  let order, icon, color, title, value
 
   switch (approval.status) {
   case "disapproved":
-    icon = 'tabler-exclamation-circle'
+    order = approval.userOrder
+    icon = null
     color = 'error'
     title = extractNamesFromEmail(approval.userEmail)
     value = "Revoqué"
     break
 
   case "pending":
-    icon = 'tabler-circle-dot'
+    order = approval.userOrder
+    icon = null
     color = 'warning'
     title = extractNamesFromEmail(approval.userEmail)
     value = "Pending"
     break
     
   case "approved":
-    icon = 'tabler-location'
+    order = approval.userOrder
+    icon = null
     color = 'success'
     title = extractNamesFromEmail(approval.userEmail)
     value = "Approuvé"
@@ -144,6 +151,7 @@ const transformApprovalToStepCards = approval => {
     // Add more cases for other status values if needed
 
   default:
+    order = null
     icon = 'tabler-user'
     color = 'primary'
     title = 'Default Title'
@@ -151,6 +159,7 @@ const transformApprovalToStepCards = approval => {
   }
 
   return {
+    order,
     icon,
     color,
     title,
@@ -200,7 +209,7 @@ const transformedData = computed(() => {
                 rounded
               >
                 <VIcon
-                  :icon="data.icon"
+                  :icon="data.icon ? data.icon : userOrder[data.order]"
                   size="28"
                 />
               </VAvatar>
