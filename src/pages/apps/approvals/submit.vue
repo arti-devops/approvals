@@ -1,6 +1,7 @@
 <script setup>
 import axios from 'axios'
 
+const data = ref({})
 const currentStep = ref(0)
 const refDocumentInfoForm = ref()
 const refValidationInfoForm = ref()
@@ -75,12 +76,11 @@ const submitForValidation = () => {
     .then(response => {
       // Disable the form when submit is successful
       userSubmitedTheForm.value = true // Lock the form
-      userSubmitedTheFormSuccessfully.value = true // Display the snackbar
       filelink.value = response.data.link
       console.log('File uploaded successfully:', response.data)
 
       // Generate the data to be sent to MongoDb
-      const data = {
+      data.value = {
         title: documentInfoForm.value.title,
         status: 'pending',
         signCounter: 0,
@@ -94,7 +94,7 @@ const submitForValidation = () => {
       }
 
       //TODO API Call : send data to db
-      console.log(data)
+      console.log(data.value)
     })
     .catch(error => {
       isDocumentDuplicate.value = true
@@ -191,6 +191,17 @@ const selectedDocumentType = computed(() => {
 const logData = () => {
   console.log(documentInfoForm.value)
 }
+
+watch(data, () => {
+  // Send data to db when form is submitted
+  //FIX Provide real link to db
+  axios.post('http://localhost:8000/approvals/submit', data.value)
+    .then(response => {
+      console.log(response.data)
+      userSubmitedTheFormSuccessfully.value = true // Display the snackbar
+    })
+    .catch(error => { console.log(error)})
+})
 </script>
 
 <template>

@@ -31,7 +31,7 @@ export const db = {
       documentType: "note",
       lastApproved: null,
       createdBy: "jk.feige@fotki.com",
-      createdAt: "2023-12-10T15:24:58.000Z",
+      createdAt: "2023-12-11T16:14:29.804+00:00",
       disapprovedFor: null,
       approvals: [
         {
