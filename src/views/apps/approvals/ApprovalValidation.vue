@@ -273,7 +273,8 @@ const transformedData = computed(() => {
           <div class="d-flex align-center flex-wrap gap-4">
             <!-- 👉 Export invoice -->
             <a
-              about="_blank"
+              target="_blank"
+              rel="noopener noreferrer"
               :href="approvalDetails.lastApproved ? approvalDetails.lastApproved : approvalDetails.documentName "
             >
               <VBtn
