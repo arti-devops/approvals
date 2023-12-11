@@ -1,6 +1,6 @@
 <!-- ❗Errors in the form are set on line 60 -->
 <script setup>
-import { VForm } from 'vuetify/components/VForm'
+import { axiosLogin } from '@/plugins/fake-api/handlers/auth/axioslogin'
 import AuthProvider from '@/views/pages/authentication/AuthProvider.vue'
 import { useGenerateImageVariant } from '@core/composable/useGenerateImageVariant'
 import authV2LoginIllustrationBorderedDark from '@images/pages/auth-v2-login-illustration-bordered-dark.png'
@@ -11,6 +11,7 @@ import authV2MaskDark from '@images/pages/misc-mask-dark.png'
 import authV2MaskLight from '@images/pages/misc-mask-light.png'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
+import { VForm } from 'vuetify/components/VForm'
 
 const authThemeImg = useGenerateImageVariant(authV2LoginIllustrationLight, authV2LoginIllustrationDark, authV2LoginIllustrationBorderedLight, authV2LoginIllustrationBorderedDark, true)
 const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)
@@ -42,30 +43,22 @@ const credentials = ref({
 const rememberMe = ref(false)
 
 const login = async () => {
-  try {
-    const res = await $api('/auth/login', {
-      method: 'POST',
-      body: {
-        email: credentials.value.email,
-        password: credentials.value.password,
-      },
-      onResponseError({ response }) {
-        errors.value = response._data.errors
-      },
-    })
 
-    const { accessToken, userData, userAbilityRules } = res
+  const { accessToken, userData, userAbilityRules } = await axiosLogin(credentials.value.email, credentials.value.password)
 
-    useCookie('userAbilityRules').value = userAbilityRules
-    ability.update(userAbilityRules)
-    useCookie('userData').value = userData
-    useCookie('accessToken').value = accessToken
-    await nextTick(() => {
-      router.replace(route.query.to ? String(route.query.to) : '/')
-    })
-  } catch (err) {
-    console.error(err)
-  }
+  console.log('Token:', accessToken)
+  console.log('User Data:', userData)
+  console.log('User Ability Rules:', userAbilityRules)
+
+  useCookie('userAbilityRules').value = userAbilityRules
+  ability.update(userAbilityRules)
+  useCookie('userData').value = userData
+  useCookie('accessToken').value = accessToken
+
+  await nextTick(() => {
+    router.replace(route.query.to ? String(route.query.to) : '/')
+  })
+
 }
 
 const onSubmit = () => {
