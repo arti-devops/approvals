@@ -1,5 +1,6 @@
 <script setup>
 import { currentDateTimeMongoDbStyle, extractNamesFromEmail, formatDateAgoExtended, formatDateFr } from '@/utils/helpers'
+import axios from 'axios'
 
 const props = defineProps({
   approvalDetails: {
@@ -8,19 +9,11 @@ const props = defineProps({
   },
 })
 
-
-// EMIT UPDATE EVENT
-const emitUpdate = defineEmits(['updateApprovalDetails'])
-
-const updateApprovalDetails = updatedApprovalDetails => {
-  emitUpdate('updateApprovalDetails', updatedApprovalDetails)
-}
-
-
 const approvalDetails = ref(props.approvalDetails.approvalDetails).value
 const approvals = ref(props.approvalDetails.approvalDetails.approvals).value
 const revocationComment = ref('')
 const userWantToRevoke = ref(false)
+const fileToUpload = ref({})
 
 //TODO check user data for revocation and update the view
 const userHasRevoked = ref(false)
@@ -32,9 +25,10 @@ const isSnackbarRevokVisible = ref(false)
 
 
 // SUBMIT AND FORM CONTROL
+//TODO Also lock form of user already supplied an action
 const isFormValid = ref(!(approvalDetails.status === 'pending'))
 
-//TEST AREA TO REMOVE
+//FIX get connected user. Ref might cause problems
 const userEmail = 'alice.zhanne@youtube.com'
 
 //const userEmail = 'amc.ginnell@lulu.com'
@@ -42,7 +36,7 @@ const userEmail = 'alice.zhanne@youtube.com'
 
 const resolveStatusIcon = status => {
   if (status === "pending") return { icon: "tabler-circle-dot", color: "warning", text: "Pending" }
-  if (status === "approved") return { icon: "tabler-send", color: "success", text: "Approuvé" }
+  if (status === "approved") return { icon: "tabler-circle-check", color: "success", text: "Approuvé" }
   if (status === "disapproved") return { icon: "tabler-exclamation-circle", color: "error", text: "Revoqué" }
   
   return "tabler-user"
@@ -56,6 +50,7 @@ const userWantToRevokeAction = () => {
   if (!userWantToRevoke.value || revocationComment.value == '') {
     userWantToRevoke.value = true
   }else{
+    //FIX Filter based on currently connected user
     const userApproval = approvalDetails.approvals.find(approval => approval.userEmail == userEmail)
 
     isFormValid.value = true
@@ -64,50 +59,57 @@ const userWantToRevokeAction = () => {
       userApproval.comment = revocationComment.value
       userApproval.signedAt = currentDateTimeMongoDbStyle()
       isSnackbarRevokVisible.value = true
-      updateApprovalDetails(approvalDetails)
       approvalDetails.status = 'disapproved'
       userWantToRevoke.value = false
     }
     userHasRevoked.value = true
+
+    //TODO Send data to mongodb
     console.log(approvalDetails)
   }
 }
 
 // FILE UPLOAD
-// FILE UPLOAD
-// FILE UPLOAD
-const file = ref()
+// TODO : File upload
+const handleFileChange = event => {
+  let selectedFile = event.target.files[0]
+  fileToUpload.value = selectedFile
+}
 
 const uploadFile = async () => {
-  if (!file.value) {
-    console.error('No file selected.')
-    
-    return
-  }
+  // FormData to send file via HTTP
+  const formData = new FormData()
+  const filelink = ref('')
 
-  const { data: uploadResponse } = await useApi(createUrl("/approval/uploadfile"))
+  formData.append("file", fileToUpload.value)
+  axios.post('http://localhost:8000/uploadfile', formData)
+    .then(response => {
 
-  if (uploadResponse.value.response.code == 200) {
-    const userApproval = approvalDetails.approvals.find(approval => approval.userEmail == userEmail)
-    if (userApproval){
-      userApproval.status = 'approved'
-      userApproval.fileName = uploadResponse.value.response.link
-      userApproval.signedAt = currentDateTimeMongoDbStyle()
-      approvalDetails.signCounter = approvalDetails.signCounter + 1
-      if (approvalDetails.signCounter == approvalDetails.approvals.length){
-        approvalDetails.status = 'approved'
+      // Get the new approved file link
+      filelink.value = response.data.link
+
+      //FIX Filter based on currently connected user
+      const userApproval = approvalDetails.approvals.find(approval => approval.userEmail == userEmail)
+      if (userApproval){
+        userApproval.status = 'approved'
+        userApproval.fileName = filelink.value
+        userApproval.signedAt = currentDateTimeMongoDbStyle()
+        approvalDetails.signCounter = approvalDetails.signCounter + 1
+        if (approvalDetails.signCounter == approvalDetails.approvals.length){
+          approvalDetails.status = 'approved'
+        }
+        approvalDetails.lastApproved = userApproval.fileName
       }
-      approvalDetails.lastApproved = userApproval.fileName
-      updateApprovalDetails(approvalDetails)
-    }
-    isFormValid.value = true
-    isSnackbarSuccessVisible.value = true
-    console.log(approvalDetails)
-  }
-  else{
-    isSnackbarErrorVisible.value = true
-  }
+      isFormValid.value = true
+      isSnackbarSuccessVisible.value = true
 
+      //TODO Send data to mongodb
+      console.log(approvalDetails)
+    })
+    .catch(error => {
+      isSnackbarErrorVisible.value = true
+      console.error('Error uploading file:', error.response.data)
+    })
 }
 
 // END FILE UPLOAD
@@ -295,10 +297,10 @@ const transformedData = computed(() => {
                 md="12"
               >
                 <VFileInput
-                  v-model="file"
                   label="Pièce jointe"
                   :rules="[requiredValidator]"
                   :disabled="isFormValid"
+                  @change="handleFileChange"
                 />
               </VCol>
 
@@ -387,7 +389,7 @@ const transformedData = computed(() => {
   </VRow>
   <VSnackbar
     v-model="isSnackbarSuccessVisible"
-    location="bottom"
+    location="top end"
     tonal="flat"
     color="success"
   >
@@ -397,7 +399,7 @@ const transformedData = computed(() => {
   </Vsnackbar>
   <VSnackbar
     v-model="isSnackbarErrorVisible"
-    location="bottom"
+    location="top end"
     tonal="flat"
     color="warning"
   >
@@ -407,7 +409,7 @@ const transformedData = computed(() => {
   </VSnackbar>
   <VSnackbar
     v-model="isSnackbarRevokVisible"
-    location="bottom"
+    location="top end"
     tonal="flat"
     color="info"
   >
