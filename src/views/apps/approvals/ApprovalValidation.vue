@@ -64,16 +64,18 @@ const userWantToRevokeAction = () => {
     userWantToRevoke.value = true
   }else{
 
-    isFormValid.value = true
+    //isFormValid.value = true
     if (userApproval){
       userApproval.status = 'disapproved'
       userApproval.comment = revocationComment.value
       userApproval.signedAt = currentDateTimeMongoDbStyle()
       isSnackbarRevokVisible.value = true
       approvalDetails.status = 'disapproved'
-      userWantToRevoke.value = false
+
+      userWantToRevoke.value = false // Hide disapproval text input
     }
-    userHasRevoked.value = true
+
+    //userHasRevoked.value = true
 
     //TODO Send data to mongodb
     console.log(approvalDetails)
@@ -402,7 +404,6 @@ watch(approvalDetails, () => {
 
           <VCardText class="justify-center">
             <VBtn
-              type="submit"
               variant="elevated"
               color="error"
               :disabled="!isFormValid"
