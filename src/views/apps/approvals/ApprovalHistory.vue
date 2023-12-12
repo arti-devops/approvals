@@ -33,7 +33,7 @@ const approvalHeaders = [
 const approvalRequestsData = shallowRef()
 
 //FIX Provide real link to db
-await axios.get('http://localhost:8000/approvals/requests')
+await axios.get('http://localhost:8000/approvals/history')
   .then(response => {
     approvalRequestsData.value = { approvalRequests: response.data }
     console.log(approvalRequestsData)
@@ -56,7 +56,7 @@ const resolveApprovalRequestStatusVariant = item => {
     return {
       text: 'Validé',
       color: 'success',
-      icon: 'tabler-location',
+      icon: 'tabler-circle-check',
     }
   if (statusToLowerCase === 'disapproved')
     return {
