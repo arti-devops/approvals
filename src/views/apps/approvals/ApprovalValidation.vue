@@ -15,6 +15,9 @@ const revocationComment = ref('')
 const userWantToRevoke = ref(false)
 const fileToUpload = ref({})
 
+// Current user email
+const userEmail = useCookie("userData").value.username
+
 //TODO check user data for revocation and update the view
 const userHasRevoked = ref(false)
 
@@ -24,14 +27,24 @@ const isSnackbarErrorVisible = ref(false)
 const isSnackbarRevokVisible = ref(false)
 
 
-// SUBMIT AND FORM CONTROL
+// FORM CONTROL
 //TODO Also lock form of user already supplied an action
-const isFormValid = ref(!(approvalDetails.status === 'pending'))
+const isFormValid = ref(true)
 
-//FIX get connected user. Ref might cause problems
-const userEmail = 'alice.zhanne@youtube.com'
+// Get current user Approval object
+const userApproval = approvalDetails.approvals.find(approval => approval.userEmail == userEmail)
 
-//const userEmail = 'amc.ginnell@lulu.com'
+if(userApproval){
+  if (userApproval.status != 'pending'){
+    isFormValid.value = false
+    console.log("isFormValid user: " + isFormValid.value)
+  }else{
+    isFormValid.value = approvalDetails.status === 'pending'
+    console.log("isFormValid: " + isFormValid.value)
+  }
+}
+
+// END FORM CONTROL
 
 
 const resolveStatusIcon = status => {
@@ -50,8 +63,6 @@ const userWantToRevokeAction = () => {
   if (!userWantToRevoke.value || revocationComment.value == '') {
     userWantToRevoke.value = true
   }else{
-    //FIX Filter based on currently connected user
-    const userApproval = approvalDetails.approvals.find(approval => approval.userEmail == userEmail)
 
     isFormValid.value = true
     if (userApproval){
@@ -100,14 +111,13 @@ const uploadFile = async () => {
         }
         approvalDetails.lastApproved = userApproval.fileName
       }
-      isFormValid.value = true
-      isSnackbarSuccessVisible.value = true
 
       //TODO Send data to mongodb
+      console.log("Update Of Approval Details")
       console.log(approvalDetails)
     })
     .catch(error => {
-      isSnackbarErrorVisible.value = true
+      isSnackbarErrorVisible.value = true // Display error feedback
       console.error('Error uploading file:', error.response.data)
     })
 }
@@ -181,6 +191,27 @@ const transformedData = computed(() => {
     },
     ...approvals.map(transformApprovalToStepCards),
   ]
+})
+
+//TODO Watch ApprovalDetails and submit updates
+watch(approvalDetails, () => {
+  // Send data to db when form is submitted
+  console.log("LOG FROM ApprovalDetails Watcher")
+  var { _id, ...data } = approvalDetails
+  console.log(_id)
+  console.log(data)
+
+  //FIX Provide real link to db
+  axios.put(`http://localhost:8000/approvals/${_id}`, data)
+    .then(response => {
+      console.log(response.data)
+      isFormValid.value = false // Lock the form
+      isSnackbarSuccessVisible.value = true // Display success feedback
+    })
+    .catch(error => { 
+      console.log(error)
+      isSnackbarErrorVisible.value = true // Display error feedback
+    })
 })
 </script>
 
@@ -300,7 +331,7 @@ const transformedData = computed(() => {
                 <VFileInput
                   label="Pièce jointe"
                   :rules="[requiredValidator]"
-                  :disabled="isFormValid"
+                  :disabled="!isFormValid"
                   @change="handleFileChange"
                 />
               </VCol>
@@ -309,7 +340,7 @@ const transformedData = computed(() => {
                 <VCardText class="d-flex flex-column justify-center align-center">
                   <VBtn
                     type="submit"
-                    :disabled="isFormValid"
+                    :disabled="!isFormValid"
                     @click="uploadFile"
                   >
                     Valider
@@ -374,7 +405,7 @@ const transformedData = computed(() => {
               type="submit"
               variant="elevated"
               color="error"
-              :disabled="isFormValid"
+              :disabled="!isFormValid"
               @click="userWantToRevokeAction"
             >
               {{ userHasRevoked? "Révoqué": "Révoquer" }}
