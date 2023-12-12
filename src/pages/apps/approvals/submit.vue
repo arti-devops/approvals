@@ -18,7 +18,7 @@ const documentInfoForm = ref({
 
 // For 3 levels of validation
 const validationInfoForm = ref({
-  validation1: 'head 1',
+  validation1: 'al.cisse@arti.local',
   validation2: 'head 2',
   validation3: 'head 3',
 })
@@ -56,7 +56,7 @@ const submitForValidation = () => {
   let validationLevels = []
   for(const d of selectedDocumentType.value.validation){
     validationLevels.push({
-      userOrder: d.level.replace(/\D/g, ""), // Take last number as user order
+      userOrder: Number(d.level.replace(/\D/g, "")), // Take last number as user order
       userEmail: validationInfoForm.value[d.level],
       status: 'pending',
       fileName: null,
@@ -87,7 +87,7 @@ const submitForValidation = () => {
         documentName: filelink.value,
         documentType: documentInfoForm.value.type,
         lastApproved: null, // Link of lastApproved Document
-        createdBy: "jk.feige@fotki.com", //FIX get Current user from login info
+        createdBy: useCookie("userData").value.username, //FIX get Current user from login info
         createdAt: currentDateTimeMongoDbStyle(),
         disapprovedFor: null,
         approvals: validationLevels,
