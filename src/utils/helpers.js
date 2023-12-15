@@ -73,7 +73,7 @@ export function extractNamesFromEmail(email) {
 
   // Extract the first and last names
   const firstName = capitalize(usernameParts[0])
-  const lastName = usernameParts.length > 1 ? capitalize(usernameParts.slice(1).join(' ')) : ''
+  const lastName = usernameParts.length > 1 ? usernameParts.slice(1).join(' ').toUpperCase() : ''
 
   return `${firstName} ${lastName}`
 }

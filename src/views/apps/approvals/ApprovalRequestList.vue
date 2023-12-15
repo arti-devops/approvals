@@ -1,4 +1,5 @@
 <script setup>
+import { DOCUMENT_TYPE } from '@/utils/constants'
 import { requestHeadersConfig } from '@/utils/helpers'
 import axios from 'axios'
 import { shallowRef } from 'vue'
@@ -41,6 +42,7 @@ await axios.get(import.meta.env.VITE_API_APV_REQUESTS_URL, requestHeadersConfig)
   })
   .catch(error => { console.log(error)})
 
+//FIX The data
 const rdata = computed(() => approvalRequestsData.value.approvalRequests)
 
 // Get current user approval status
@@ -73,6 +75,12 @@ const resolveApprovalRequestProgress = item => {
   
   return Math.round(signCounter/totalApprovers*100)
 }
+
+// Find the index of the connected user's approval in the approvals array
+//console.log(rdata.value)
+const getConnectedUserIndex = data => {
+  return data.approvals.findIndex(approval => approval.userEmail ===  useCookie("userData").value?.username)
+}
 </script>
 
 <template>
@@ -87,6 +95,11 @@ const resolveApprovalRequestProgress = item => {
       :items-length="rdata.length"
       item-selectable
     >
+      <!-- Type -->
+      <template #item.documentType="{ item }">
+        {{ DOCUMENT_TYPE[item.documentType] }}
+      </template>
+
       <!-- Status -->
       <template #item.status="{ item }">
         <div class="d-flex align-center gap-4">
@@ -125,8 +138,20 @@ const resolveApprovalRequestProgress = item => {
       <!-- Actions -->
       <template #item.actions="{ item }">
         <div class="d-flex gap-1">
-          <IconBtn :to="{ name: 'apps-approvals-view-id', params: { id: item._id }}">
-            <VIcon icon="tabler-file" />
+          <IconBtn
+            v-if="!(getConnectedUserIndex(item)==item.signCounter)"
+            :to="{ name: 'apps-approvals-view-id', params: { id: item._id }}"
+          >
+            <VIcon icon="tabler-file-filled" />
+          </IconBtn>
+          <IconBtn
+            v-if="getConnectedUserIndex(item)==item.signCounter"
+            :to="{ name: 'apps-approvals-view-id', params: { id: item._id }}"
+          >
+            <VIcon
+              icon="tabler-file-filled"
+              color="warning"
+            />
           </IconBtn>
           <IconBtn v-if="userHasApproved(item.approvals)">
             <VIcon

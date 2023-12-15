@@ -1,4 +1,5 @@
 <script setup>
+import { DOCUMENT_TYPE } from '@/utils/constants'
 import { extractNamesFromEmail, formatDateAgoExtended, requestHeadersConfig } from '@/utils/helpers'
 import axios from 'axios'
 import { VDataTableServer } from 'vuetify/labs/VDataTable'
@@ -94,6 +95,11 @@ const resolveApprovalRequestStatusVariant = item => {
       :items="rdata"
       :items-length="rdata.length"
     >
+      <!-- Type -->
+      <template #item.documentType="{ item }">
+        {{ DOCUMENT_TYPE[item.documentType] }}
+      </template>
+      
       <!-- Status -->
       <template #item.status="{ item }">
         <div class="d-flex align-center gap-4">
