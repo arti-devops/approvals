@@ -13,7 +13,11 @@ const approvalDetails = ref(props.approvalDetails.approvalDetails).value
 const approvals = ref(props.approvalDetails.approvalDetails.approvals).value
 const revocationComment = ref('')
 const userWantToRevoke = ref(false)
-const fileToUpload = ref({})
+const fileToUpload = ref(undefined)
+
+const errors = ref({
+  revocation: undefined,
+})
 
 // Current user email
 const userEmail = useCookie("userData").value.username
@@ -29,7 +33,7 @@ const isSnackbarRevokVisible = ref(false)
 
 // FORM CONTROL
 //TODO Also lock form of user already supplied an action
-const isFormValid = ref(true)
+const isFormValid = ref(!(approvalDetails.createdBy===userEmail))
 
 // Get current user Approval object
 const userApproval = approvalDetails.approvals.find(approval => approval.userEmail == userEmail)
@@ -61,6 +65,8 @@ const approvalStatusinfo = computed(() => {
 
 const userWantToRevokeAction = () => {
   if (!userWantToRevoke.value || revocationComment.value == '') {
+    if((userWantToRevoke.value===true) && (errors.value.revocation===undefined))
+      errors.value.revocation = "Veuillez saisir le motif de révocation."
     userWantToRevoke.value = true
   }else{
 
@@ -90,18 +96,21 @@ const handleFileChange = event => {
 }
 
 const uploadFile = async () => {
+  // Prevent sending fata to server if no file is present
+  if(fileToUpload.value == undefined) return
+
   // FormData to send file via HTTP
   const formData = new FormData()
   const filelink = ref('')
 
   formData.append("file", fileToUpload.value)
-  axios.post('http://localhost:8000/uploadfile', formData)
+  axios.post(import.meta.env.VITE_API_FILE_UPLOAD_URL, formData)
     .then(response => {
 
       // Get the new approved file link
       filelink.value = response.data.link
 
-      //FIX Filter based on currently connected user
+      //TODO Watch action depends on this success
       const userApproval = approvalDetails.approvals.find(approval => approval.userEmail == userEmail)
       if (userApproval){
         userApproval.status = 'approved'
@@ -114,7 +123,7 @@ const uploadFile = async () => {
         approvalDetails.lastApproved = userApproval.fileName
       }
 
-      //TODO Send data to mongodb
+      //TODO Watch action sends data to mongodb
       console.log("Update Of Approval Details")
       console.log(approvalDetails)
     })
@@ -203,12 +212,12 @@ watch(approvalDetails, () => {
   console.log(_id)
   console.log(data)
 
-  //FIX Provide real link to db
-  axios.put(`http://localhost:8000/approvals/${_id}`, data)
+  axios.put(import.meta.env.VITE_API_APV_UPDATE_URL+`/${_id}`, data)
     .then(response => {
       console.log(response.data)
       isFormValid.value = false // Lock the form
-      isSnackbarSuccessVisible.value = true // Display success feedback
+      if(!(isSnackbarRevokVisible.value===true))
+        isSnackbarSuccessVisible.value = true // Display success feedback
     })
     .catch(error => { 
       console.log(error)
@@ -395,10 +404,11 @@ watch(approvalDetails, () => {
           <VCardText v-if="userWantToRevoke">
             <AppTextarea
               v-model="revocationComment"
-              label="Justificatif de désapprobation"
-              placeholder="Saisissez votre justificatif de désapprobation"
+              label="Justificatif de révocation"
+              placeholder="Saisissez votre justificatif de révocation"
               auto-grow
               :rules="[requiredValidator]"
+              :error-messages="errors.revocation"
             />
           </VCardText>
 

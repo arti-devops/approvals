@@ -1,7 +1,6 @@
 <!-- ❗Errors in the form are set on line 60 -->
 <script setup>
 import { axiosLogin } from '@/plugins/fake-api/handlers/auth/axioslogin'
-import AuthProvider from '@/views/pages/authentication/AuthProvider.vue'
 import { useGenerateImageVariant } from '@core/composable/useGenerateImageVariant'
 import authV2LoginIllustrationBorderedDark from '@images/pages/auth-v2-login-illustration-bordered-dark.png'
 import authV2LoginIllustrationBorderedLight from '@images/pages/auth-v2-login-illustration-bordered-light.png'
@@ -44,20 +43,26 @@ const rememberMe = ref(false)
 
 const login = async () => {
 
-  const { accessToken, userData, userAbilityRules } = await axiosLogin(credentials.value.email, credentials.value.password)
+  try {
+    const { accessToken, userData, userAbilityRules } = await axiosLogin(credentials.value.email, credentials.value.password)
 
-  console.log('Token:', accessToken)
-  console.log('User Data:', userData)
-  console.log('User Ability Rules:', userAbilityRules)
+    console.log('Token:', accessToken)
+    console.log('User Data:', userData)
+    console.log('User Ability Rules:', userAbilityRules)
 
-  useCookie('userAbilityRules').value = userAbilityRules
-  ability.update(userAbilityRules)
-  useCookie('userData').value = userData
-  useCookie('accessToken').value = accessToken
+    useCookie('userAbilityRules').value = userAbilityRules
+    ability.update(userAbilityRules)
+    useCookie('userData').value = userData
+    useCookie('accessToken').value = accessToken
 
-  await nextTick(() => {
-    router.replace(route.query.to ? String(route.query.to) : '/')
-  })
+    await nextTick(() => {
+      router.replace(route.query.to ? String(route.query.to) : '/')
+    })
+  } catch (error) {
+    errors.value.email = "Problème sur votre identifiant"
+    errors.value.password = "Problème sur votre Mot de Passe"
+    console.log(error)
+  }
 
 }
 
@@ -111,10 +116,10 @@ const onSubmit = () => {
           />
 
           <h4 class="text-h4 mb-1">
-            Welcome to <span class="text-capitalize"> {{ themeConfig.app.title }} </span>! 👋🏻
+            Bienvenue sur <span class="text-capitalize"> {{ themeConfig.app.title }} </span> !
           </h4>
           <p class="mb-0">
-            Please sign-in to your account and start the adventure
+            Veuillez vous connecter avec vos identifiants Windows.
           </p>
         </VCardText>
         <VCardText>
@@ -141,7 +146,7 @@ const onSubmit = () => {
                 <AppTextField
                   v-model="credentials.email"
                   label="Email"
-                  placeholder="johndoe@email.com"
+                  placeholder="prenom.nom@arti.local"
                   type="email"
                   autofocus
                   :rules="[requiredValidator, emailValidator]"
@@ -153,7 +158,7 @@ const onSubmit = () => {
               <VCol cols="12">
                 <AppTextField
                   v-model="credentials.password"
-                  label="Password"
+                  label="Mot de passe"
                   placeholder="············"
                   :rules="[requiredValidator]"
                   :type="isPasswordVisible ? 'text' : 'password'"
@@ -165,52 +170,16 @@ const onSubmit = () => {
                 <div class="d-flex align-center flex-wrap justify-space-between mt-1 mb-4">
                   <VCheckbox
                     v-model="rememberMe"
-                    label="Remember me"
+                    label="Se souvenir de moi"
                   />
-                  <RouterLink
-                    class="text-primary ms-2 mb-1"
-                    :to="{ name: 'forgot-password' }"
-                  >
-                    Forgot Password?
-                  </RouterLink>
                 </div>
 
                 <VBtn
                   block
                   type="submit"
                 >
-                  Login
+                  Connexion
                 </VBtn>
-              </VCol>
-
-              <!-- create account -->
-              <VCol
-                cols="12"
-                class="text-center"
-              >
-                <span>New on our platform?</span>
-                <RouterLink
-                  class="text-primary ms-2"
-                  :to="{ name: 'register' }"
-                >
-                  Create an account
-                </RouterLink>
-              </VCol>
-              <VCol
-                cols="12"
-                class="d-flex align-center"
-              >
-                <VDivider />
-                <span class="mx-4">or</span>
-                <VDivider />
-              </VCol>
-
-              <!-- auth providers -->
-              <VCol
-                cols="12"
-                class="text-center"
-              >
-                <AuthProvider />
               </VCol>
             </VRow>
           </VForm>

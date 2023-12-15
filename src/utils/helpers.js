@@ -1,3 +1,10 @@
+export const requestHeadersConfig = {
+  headers: {
+    'Authorization': "Bearer " + useCookie("accessToken").value,
+    'Content-Type': 'application/json',
+  },
+}
+
 export function currentDateTimeMongoDbStyle(){
   // Create a new Date object
   const currentDate = new Date()

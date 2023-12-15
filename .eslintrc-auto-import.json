@@ -365,6 +365,7 @@
     "formatDateAgoShort": true,
     "formatDateAgoExtended": true,
     "formatDatef": true,
-    "formatDateFr": true
+    "formatDateFr": true,
+    "requestHeadersConfig": true
   }
 }

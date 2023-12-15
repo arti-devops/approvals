@@ -1,4 +1,5 @@
 <script setup>
+import { requestHeadersConfig } from '@/utils/helpers'
 import axios from 'axios'
 import { shallowRef } from 'vue'
 import { VDataTableServer } from 'vuetify/labs/VDataTable'
@@ -32,8 +33,7 @@ const approvalHeaders = [
 
 const approvalRequestsData = shallowRef()
 
-//FIX Provide real link to db
-await axios.get('http://localhost:8000/approvals/requests')
+await axios.get(import.meta.env.VITE_API_APV_REQUESTS_URL, requestHeadersConfig)
   .then(response => {
     approvalRequestsData.value = { approvalRequests: response.data }
     console.log(approvalRequestsData)
@@ -43,13 +43,20 @@ await axios.get('http://localhost:8000/approvals/requests')
 
 const rdata = computed(() => approvalRequestsData.value.approvalRequests)
 
+// Get current user approval status
+const userHasApproved = approvalrequests => {
+  return approvalrequests.some(approval => (
+    approval.userEmail === useCookie("userData").value?.username && approval.status === "approved"
+  ))
+}
+
 const resolveApprovalRequestStatusVariant = item => {
   const status = item.status
   const statusToLowerCase = status.toLowerCase()
   if ((statusToLowerCase === 'pending' && item.signCounter > 0))
     return {
       text: 'Validation',
-      color: 'info',
+      color: 'primary',
       icon: 'tabler-progress',
     }
   if (statusToLowerCase === 'pending')
@@ -120,6 +127,12 @@ const resolveApprovalRequestProgress = item => {
         <div class="d-flex gap-1">
           <IconBtn :to="{ name: 'apps-approvals-view-id', params: { id: item._id }}">
             <VIcon icon="tabler-file" />
+          </IconBtn>
+          <IconBtn v-if="userHasApproved(item.approvals)">
+            <VIcon
+              icon="tabler-circle-check"
+              color="success"
+            />
           </IconBtn>
         </div>
       </template>

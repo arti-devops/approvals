@@ -8,7 +8,7 @@ const route = useRoute('apps-approvals-view-id')
 const data = shallowRef()
 
 //FIX API CALL: Provide real link to db
-await axios.get(`http://localhost:8000/approvals/${ route.params.id }`)
+await axios.get(import.meta.env.VITE_API_APV_DETAILS_URL+`/${ route.params.id }`)
   .then(response => {
     console.log("LOG FROM view PAGE")
     data.value = { approvalDetails: response.data }

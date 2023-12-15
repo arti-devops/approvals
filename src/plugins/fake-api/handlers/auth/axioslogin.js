@@ -16,7 +16,7 @@ export const axiosLogin = async (username, password) => {
     }
 
     // Make a POST request to the /token endpoint
-    const response = await axios.post('http://127.0.0.1:8001/token', {}, config)
+    const response = await axios.post(import.meta.env.VITE_API_LOGIN_URL, {}, config)
 
     // Decode the token
     const decodedToken = jwtDecode(response.data.access_token)

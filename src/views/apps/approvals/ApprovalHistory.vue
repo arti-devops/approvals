@@ -1,7 +1,10 @@
 <script setup>
-import { extractNamesFromEmail, formatDateAgoExtended } from '@/utils/helpers'
+import { extractNamesFromEmail, formatDateAgoExtended, requestHeadersConfig } from '@/utils/helpers'
 import axios from 'axios'
 import { VDataTableServer } from 'vuetify/labs/VDataTable'
+
+const route = useRoute()
+const router = useRouter()
 
 const approvalHeaders = [
   {
@@ -32,8 +35,7 @@ const approvalHeaders = [
 
 const approvalRequestsData = shallowRef()
 
-//FIX Provide real link to db
-await axios.get('http://localhost:8000/approvals/history')
+await axios.get(import.meta.env.VITE_API_APV_HISTORY_URL, requestHeadersConfig)
   .then(response => {
     approvalRequestsData.value = { approvalRequests: response.data }
     console.log(approvalRequestsData)
@@ -42,6 +44,20 @@ await axios.get('http://localhost:8000/approvals/history')
   .catch(error => { console.log(error)})
 
 const rdata = computed(() => approvalRequestsData.value.approvalRequests)
+
+// Get current user approval status
+const userHasApproved = approvalrequests => {
+  return approvalrequests.some(approval => (
+    approval.userEmail === useCookie("userData").value?.username && approval.status === "approved"
+  ))
+}
+
+// Get current user approval status
+const userHasRevoked = approvalrequests => {
+  return approvalrequests.some(approval => (
+    approval.userEmail === useCookie("userData").value?.username && approval.status === "disapproved"
+  ))
+}
 
 const resolveApprovalRequestStatusVariant = item => {
   const status = item.status
@@ -110,6 +126,18 @@ const resolveApprovalRequestStatusVariant = item => {
         <div class="d-flex gap-1">
           <IconBtn :to="{ name: 'apps-approvals-view-id', params : {id : item._id}}">
             <VIcon icon="tabler-file-filled" />
+          </IconBtn>
+          <IconBtn v-if="userHasApproved(item.approvals)">
+            <VIcon
+              icon="tabler-circle-check"
+              color="success"
+            />
+          </IconBtn>
+          <IconBtn v-if="userHasRevoked(item.approvals)">
+            <VIcon
+              icon="tabler-circle-x"
+              color="error"
+            />
           </IconBtn>
         </div>
       </template>
