@@ -21,6 +21,11 @@ const errors = ref({
 
 // Current user email
 const userEmail = useCookie("userData").value.username
+const connectedUserIndex = approvalDetails.approvals.findIndex(approval => approval.userEmail === userEmail)
+
+console.log("USER INDex")
+console.log(connectedUserIndex)
+
 
 //TODO check user data for revocation and update the view
 const userHasRevoked = ref(false)
@@ -33,20 +38,35 @@ const isSnackbarRevokVisible = ref(false)
 
 // FORM CONTROL
 //TODO Also lock form of user already supplied an action
-const isFormValid = ref(!(approvalDetails.createdBy===userEmail))
+//const isFormValid = ref(true)
 
 // Get current user Approval object
 const userApproval = approvalDetails.approvals.find(approval => approval.userEmail == userEmail)
 
-if(userApproval){
-  if (userApproval.status != 'pending'){
-    isFormValid.value = false
-    console.log("isFormValid user: " + isFormValid.value)
-  }else{
-    isFormValid.value = approvalDetails.status === 'pending'
-    console.log("isFormValid: " + isFormValid.value)
+const isFormValid = computed(() => {
+
+  if(userApproval){
+  // Lock the form if User created the request
+    if(approvalDetails.createdBy===userEmail) return false
+
+    // Lock the form if Approval Request is no more Pending
+    if(approvalDetails.status != 'pending') return false
+
+    console.log("USEREmail")
+    console.log(userEmail)
+    console.log("signCOUNT")
+    console.log(approvalDetails.signCounter)
+
+    // Lock the form if it's not user turn
+    return connectedUserIndex==approvalDetails.signCounter
   }
-}
+
+  // return !(approvalDetails.createdBy === userEmail) && connectedUserIndex === approvalDetails.signCount
+})
+
+
+
+//else if (connectedUserIndex != approvalDetails.signCount) return false
 
 // END FORM CONTROL
 
