@@ -367,6 +367,7 @@
     "formatDatef": true,
     "formatDateFr": true,
     "requestHeadersConfig": true,
-    "DOCUMENT_TYPE": true
+    "DOCUMENT_TYPE": true,
+    "ws": true
   }
 }

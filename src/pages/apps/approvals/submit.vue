@@ -72,7 +72,7 @@ const submitForValidation = () => {
   formData.append("file", documentInfoForm.value.file)
 
   //TODO The API Call //FIX Change API link
-  axios.post('http://localhost:8000/uploadfile', formData)
+  axios.post(import.meta.env.VITE_API_FILE_UPLOAD_URL, formData)
     .then(response => {
       // Disable the form when submit is successful
       userSubmitedTheForm.value = true // Lock the form
@@ -195,12 +195,16 @@ const logData = () => {
 watch(data, () => {
   // Send data to db when form is submitted
   //FIX Provide real link to db
-  axios.post('http://localhost:8000/approvals/submit', data.value)
+  axios.post(import.meta.env.VITE_API_APV_CREATE_URL, data.value)
     .then(response => {
       console.log(response.data)
       userSubmitedTheFormSuccessfully.value = true // Display the snackbar
     })
-    .catch(error => { console.log(error)})
+    .catch(error => { 
+      console.log(error)
+      isDocumentDuplicate.value = true
+      userSubmitedTheForm.value = false // UnLock the form on validation failled
+    })
 })
 </script>
 
