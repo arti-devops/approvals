@@ -57,6 +57,7 @@ declare global {
   const emailValidator: typeof import('./src/@core/utils/validators.js')['emailValidator']
   const extendRef: typeof import('@vueuse/core')['extendRef']
   const extractAndCapitalizeNamesFromEmail: typeof import('./src/utils/helpers.js')['extractAndCapitalizeNamesFromEmail']
+  const extractFnameAndLnameFromEmail: typeof import('./src/utils/helpers.js')['extractFnameAndLnameFromEmail']
   const extractNamesFromEmail: typeof import('./src/utils/helpers.js')['extractNamesFromEmail']
   const formatDate: typeof import('./src/@core/utils/formatters.js')['formatDate']
   const formatDateAgo: typeof import('./src/utils/helpers.js')['formatDateAgo']
@@ -421,6 +422,7 @@ declare module 'vue' {
     readonly effectScope: UnwrapRef<typeof import('vue')['effectScope']>
     readonly emailValidator: UnwrapRef<typeof import('./src/@core/utils/validators.js')['emailValidator']>
     readonly extendRef: UnwrapRef<typeof import('@vueuse/core')['extendRef']>
+    readonly extractFnameAndLnameFromEmail: UnwrapRef<typeof import('./src/utils/helpers.js')['extractFnameAndLnameFromEmail']>
     readonly extractNamesFromEmail: UnwrapRef<typeof import('./src/utils/helpers.js')['extractNamesFromEmail']>
     readonly formatDate: UnwrapRef<typeof import('./src/@core/utils/formatters.js')['formatDate']>
     readonly formatDateAgoExtended: UnwrapRef<typeof import('./src/utils/helpers.js')['formatDateAgoExtended']>
@@ -774,6 +776,7 @@ declare module '@vue/runtime-core' {
     readonly effectScope: UnwrapRef<typeof import('vue')['effectScope']>
     readonly emailValidator: UnwrapRef<typeof import('./src/@core/utils/validators.js')['emailValidator']>
     readonly extendRef: UnwrapRef<typeof import('@vueuse/core')['extendRef']>
+    readonly extractFnameAndLnameFromEmail: UnwrapRef<typeof import('./src/utils/helpers.js')['extractFnameAndLnameFromEmail']>
     readonly extractNamesFromEmail: UnwrapRef<typeof import('./src/utils/helpers.js')['extractNamesFromEmail']>
     readonly formatDate: UnwrapRef<typeof import('./src/@core/utils/formatters.js')['formatDate']>
     readonly formatDateAgoExtended: UnwrapRef<typeof import('./src/utils/helpers.js')['formatDateAgoExtended']>

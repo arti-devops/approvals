@@ -369,6 +369,7 @@
     "requestHeadersConfig": true,
     "DOCUMENT_TYPE": true,
     "ws": true,
-    "DOCUMENT_STATUS": true
+    "DOCUMENT_STATUS": true,
+    "extractFnameAndLnameFromEmail": true
   }
 }

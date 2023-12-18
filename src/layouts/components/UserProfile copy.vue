@@ -1,5 +1,4 @@
 <script setup>
-import { extractNamesFromEmail } from '@/utils/helpers'
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
 
 const router = useRouter()
@@ -32,8 +31,53 @@ const userProfileList = [
   { type: 'divider' },
   {
     type: 'navItem',
+    icon: 'tabler-user',
+    title: 'Profile',
+    to: {
+      name: 'apps-user-view-id',
+      params: { id: 21 },
+    },
+  },
+  {
+    type: 'navItem',
+    icon: 'tabler-settings',
+    title: 'Settings',
+    to: {
+      name: 'pages-account-settings-tab',
+      params: { tab: 'account' },
+    },
+  },
+  {
+    type: 'navItem',
+    icon: 'tabler-credit-card',
+    title: 'Billing',
+    to: {
+      name: 'pages-account-settings-tab',
+      params: { tab: 'billing-plans' },
+    },
+    badgeProps: {
+      color: 'error',
+      content: '3',
+    },
+  },
+  { type: 'divider' },
+  {
+    type: 'navItem',
+    icon: 'tabler-currency-dollar',
+    title: 'Pricing',
+    to: { name: 'pages-pricing' },
+  },
+  {
+    type: 'navItem',
+    icon: 'tabler-help-circle',
+    title: 'FAQ',
+    to: { name: 'pages-faq' },
+  },
+  { type: 'divider' },
+  {
+    type: 'navItem',
     icon: 'tabler-logout',
-    title: 'Se déconnecter',
+    title: 'Logout',
     onClick: logout,
   },
 ]
@@ -100,9 +144,9 @@ const userProfileList = [
             </template>
 
             <VListItemTitle class="font-weight-medium">
-              {{ extractNamesFromEmail(userData.fullName) || userData.username }}
+              {{ userData.fullName || userData.username }}
             </VListItemTitle>
-            <VListItemSubtitle>{{ userData.username }}</VListItemSubtitle>
+            <VListItemSubtitle>{{ userData.role }}</VListItemSubtitle>
           </VListItem>
 
           <PerfectScrollbar :options="{ wheelPropagation: false }">

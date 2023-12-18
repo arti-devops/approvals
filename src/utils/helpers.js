@@ -78,6 +78,22 @@ export function extractNamesFromEmail(email) {
   return `${firstName} ${lastName}`
 }
 
+export function extractFnameAndLnameFromEmail(email) {
+  // Ensure the input is a string
+  if (typeof email !== 'string') {
+    throw new Error('Invalid email format')
+  }
+
+  // Split the username by dots
+  const usernameParts = email.split('@')[0].split('.')
+
+  // Extract the first and last names
+  const firstName = capitalize(usernameParts[0])
+  const lastName = usernameParts.length > 1 ? usernameParts.slice(1).join(' ').toUpperCase() : ''
+
+  return { firstName, lastName }
+}
+
 function capitalize(str) {
   // Capitalize the first letter of a string
   return str.charAt(0).toUpperCase() + str.slice(1)
