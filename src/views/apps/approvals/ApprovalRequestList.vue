@@ -1,5 +1,5 @@
 <script setup>
-import { DOCUMENT_TYPE } from '@/utils/constants'
+import { DOCUMENT_STATUS, DOCUMENT_TYPE } from '@/utils/constants'
 import axios from 'axios'
 import { shallowRef } from 'vue'
 import { VDataTableServer } from 'vuetify/labs/VDataTable'
@@ -70,7 +70,7 @@ const resolveApprovalRequestStatusVariant = item => {
     }
   if (statusToLowerCase === 'pending')
     return {
-      text: 'Pending',
+      text: DOCUMENT_STATUS[statusToLowerCase],
       color: 'warning',
       icon: 'tabler-circle-dot',
     }

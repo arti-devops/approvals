@@ -5,3 +5,9 @@ export const DOCUMENT_TYPE = {
   note: "NOTE AU DG",
   furnitures: "FOURNITURES/MATERIELS",
 }
+
+export const DOCUMENT_STATUS = {
+  pending: "En attente",
+  approved: "Validé",
+  disapproved: "Révoqué",
+}

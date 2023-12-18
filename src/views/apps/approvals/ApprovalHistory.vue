@@ -1,5 +1,5 @@
 <script setup>
-import { DOCUMENT_TYPE } from '@/utils/constants'
+import { DOCUMENT_STATUS, DOCUMENT_TYPE } from '@/utils/constants'
 import { extractNamesFromEmail, formatDateAgoExtended } from '@/utils/helpers'
 import axios from 'axios'
 import { VDataTableServer } from 'vuetify/labs/VDataTable'
@@ -72,19 +72,19 @@ const resolveApprovalRequestStatusVariant = item => {
   const statusToLowerCase = status.toLowerCase()
   if (statusToLowerCase === 'pending')
     return {
-      text: 'Pending',
+      text: DOCUMENT_STATUS[statusToLowerCase],
       color: 'warning',
       icon: 'tabler-circle-dot',
     }
   if (statusToLowerCase === 'approved')
     return {
-      text: 'Validé',
+      text: DOCUMENT_STATUS[statusToLowerCase],
       color: 'success',
       icon: 'tabler-circle-check',
     }
   if (statusToLowerCase === 'disapproved')
     return {
-      text: 'Revoqué',
+      text: DOCUMENT_STATUS[statusToLowerCase],
       color: 'error',
       icon: 'tabler-exclamation-circle',
     }
