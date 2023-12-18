@@ -1,11 +1,18 @@
 <script setup>
 import { DOCUMENT_TYPE } from '@/utils/constants'
-import { extractNamesFromEmail, formatDateAgoExtended, requestHeadersConfig } from '@/utils/helpers'
+import { extractNamesFromEmail, formatDateAgoExtended } from '@/utils/helpers'
 import axios from 'axios'
 import { VDataTableServer } from 'vuetify/labs/VDataTable'
 
 const route = useRoute()
 const router = useRouter()
+
+const requestHeadersConfig = {
+  headers: {
+    'Authorization': "Bearer " + useCookie("accessToken").value,
+    'Content-Type': 'application/json',
+  },
+}
 
 const approvalHeaders = [
   {

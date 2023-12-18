@@ -1,9 +1,15 @@
 <script setup>
 import { DOCUMENT_TYPE } from '@/utils/constants'
-import { requestHeadersConfig } from '@/utils/helpers'
 import axios from 'axios'
 import { shallowRef } from 'vue'
 import { VDataTableServer } from 'vuetify/labs/VDataTable'
+
+const requestHeadersConfig = {
+  headers: {
+    'Authorization': "Bearer " + useCookie("accessToken").value,
+    'Content-Type': 'application/json',
+  },
+}
 
 const approvalHeaders = [
   {
